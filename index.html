@@ -3,1325 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>班级小组竞赛积分系统</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>班级小组竞赛系统</title>
     <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --danger-color: #e74c3c;
-            --warning-color: #f39c12;
-            --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-toggle {
+            display: flex;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: #f5f7fa;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn.active {
+            background-color: #3a7bd5;
+            color: white;
+        }
+        
+        .form {
+            display: none;
+        }
+        
+        .form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
             color: #333;
         }
         
-        .navbar {
-            background-color: var(--dark-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
         }
         
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-            border: none;
+        .form-group input:focus {
+            border-color: #3a7bd5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(58, 123, 213, 0.2);
         }
         
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .group-card {
-            border-left: 5px solid var(--primary-color);
-        }
-        
-        .student-card {
-            border-left: 5px solid var(--secondary-color);
-        }
-        
-        .leader-badge {
-            background-color: var(--warning-color);
-        }
-        
-        .score-badge {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        
-        .action-btn {
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .modal-content {
-            border-radius: 15px;
-            border: none;
-        }
-        
-        .modal-header {
-            background-color: var(--dark-color);
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
             color: white;
-            border-radius: 15px 15px 0 0;
-        }
-        
-        .praise {
-            color: var(--secondary-color);
-            font-weight: bold;
-        }
-        
-        .criticism {
-            color: var(--danger-color);
-            font-weight: bold;
-        }
-        
-        .group-rank {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        .progress {
-            height: 10px;
-            margin-top: 5px;
-        }
-        
-        .student-item {
-            padding: 10px 15px;
+            border: none;
             border-radius: 8px;
-            margin-bottom: 8px;
-            background-color: white;
-            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
         
-        .student-item:hover {
-            background-color: #f1f8ff;
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(58, 123, 213, 0.4);
         }
         
-        .stats-card {
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
             text-align: center;
-            padding: 15px;
+            display: none;
         }
         
-        .stats-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
+        .message.success {
+            background-color: #e7f7ef;
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
         }
         
-        .stats-label {
-            font-size: 0.9rem;
-            color: #6c757d;
+        .message.error {
+            background-color: #fde8e8;
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
         }
         
-        .group-header {
-            background-color: rgba(52, 152, 219, 0.1);
-            border-radius: 8px;
-            padding: 10px 15px;
-            margin-bottom: 10px;
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-trophy me-2"></i>班级小组竞赛积分系统
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <button class="btn btn-outline-light btn-sm action-btn me-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                            <i class="fas fa-user-plus me-1"></i>添加学生
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-outline-light btn-sm action-btn me-2" data-bs-toggle="modal" data-bs-target="#batchAddModal">
-                            <i class="fas fa-users me-1"></i>批量添加
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-outline-light btn-sm action-btn" id="saveDataBtn">
-                            <i class="fas fa-save me-1"></i>保存数据
-                        </button>
-                    </li>
-                </ul>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>班级小组竞赛系统</h1>
+            <p>登录或创建账号，开始管理您的班级竞赛</p>
         </div>
-    </nav>
-
-    <!-- 主要内容区域 -->
-    <div class="container mt-4">
-        <!-- 统计信息 -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="stats-number" id="totalGroups">0</div>
-                    <div class="stats-label">小组总数</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="stats-number" id="totalStudents">0</div>
-                    <div class="stats-label">学生总数</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="stats-number" id="ungroupedStudents">0</div>
-                    <div class="stats-label">未分组学生</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
-                    <div class="stats-number" id="topGroupScore">0</div>
-                    <div class="stats-label">最高小组积分</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 小组排名 -->
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0"><i class="fas fa-list-ol me-2"></i>小组积分排名</h4>
-                    </div>
-                    <div class="card-body" id="groupsRanking"></div>
-                </div>
+        
+        <div class="form-container">
+            <div class="form-toggle">
+                <button class="toggle-btn active" id="login-toggle">登录</button>
+                <button class="toggle-btn" id="register-toggle">注册</button>
             </div>
             
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="fas fa-user-friends me-2"></i>未分组学生</h5>
-                    </div>
-                    <div class="card-body" id="ungroupedStudentsList">
-                        <div class="text-center py-3 text-muted" id="noUngroupedMessage">
-                            <i class="fas fa-user-slash fa-2x mb-2"></i>
-                            <p>暂无未分组学生</p>
-                        </div>
-                    </div>
+            <form id="login-form" class="form active">
+                <div class="form-group">
+                    <label for="login-username">用户名</label>
+                    <input type="text" id="login-username" placeholder="请输入用户名" required>
                 </div>
                 
-                <div class="card mt-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>快速操作</h5>
-                    </div>
-                    <div class="card-body">
-                        <button class="btn btn-primary w-100 mb-2 action-btn" data-bs-toggle="modal" data-bs-target="#modifyScoreModal">
-                            <i class="fas fa-edit me-1"></i>修改积分
-                        </button>
-                        <button class="btn btn-success w-100 mb-2 action-btn" data-bs-toggle="modal" data-bs-target="#moveStudentModal">
-                            <i class="fas fa-exchange-alt me-1"></i>学生转组
-                        </button>
-                        <button class="btn btn-danger w-100 action-btn" id="resetDataBtn">
-                            <i class="fas fa-trash-alt me-1"></i>重置数据
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="login-password">密码</label>
+                    <input type="password" id="login-password" placeholder="请输入密码" required>
                 </div>
+                
+                <button type="submit" class="submit-btn">登录</button>
+            </form>
+            
+            <form id="register-form" class="form">
+                <div class="form-group">
+                    <label for="register-username">用户名</label>
+                    <input type="text" id="register-username" placeholder="请设置用户名" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">密码</label>
+                    <input type="password" id="register-password" placeholder="请设置密码" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm-password">确认密码</label>
+                    <input type="password" id="register-confirm-password" placeholder="请再次输入密码" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">创建账号</button>
+            </form>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="footer">
+                <p>© 2023 班级小组竞赛系统 | 教师专用</p>
             </div>
         </div>
     </div>
 
-    <!-- 添加学生模态框 -->
-    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">添加学生</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="studentName" class="form-label">学生姓名</label>
-                        <input type="text" class="form-control" id="studentName" placeholder="请输入学生姓名">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">小组分配</label>
-                        <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="groupOption" id="noGroup" value="noGroup" checked>
-                                <label class="form-check-label" for="noGroup">
-                                    不加入小组
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="groupOption" id="existingGroup" value="existingGroup">
-                                <label class="form-check-label" for="existingGroup">
-                                    现有小组
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="groupOption" id="newGroup" value="newGroup">
-                                <label class="form-check-label" for="newGroup">
-                                    创建新小组
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3" id="existingGroupSelect" style="display: none;">
-                        <label for="groupSelect" class="form-label">选择小组</label>
-                        <select class="form-select" id="groupSelect"></select>
-                    </div>
-                    <div class="mb-3" id="leaderOption" style="display: none;">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isLeader">
-                            <label class="form-check-label" for="isLeader">
-                                设为组长
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="addStudentBtn">添加</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 批量添加模态框 -->
-    <div class="modal fade" id="batchAddModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">批量添加学生</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">小组分配</label>
-                        <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="batchGroupOption" id="batchNoGroup" value="noGroup" checked>
-                                <label class="form-check-label" for="batchNoGroup">
-                                    不加入小组
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="batchGroupOption" id="batchExistingGroup" value="existingGroup">
-                                <label class="form-check-label" for="batchExistingGroup">
-                                    现有小组
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="batchGroupOption" id="batchNewGroup" value="newGroup">
-                                <label class="form-check-label" for="batchNewGroup">
-                                    创建新小组
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3" id="batchExistingGroupSelect" style="display: none;">
-                        <label for="batchGroupSelect" class="form-label">选择小组</label>
-                        <select class="form-select" id="batchGroupSelect"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="studentNames" class="form-label">学生姓名（每行一个）</label>
-                        <textarea class="form-control" id="studentNames" rows="6" placeholder="请输入学生姓名，每行一个"></textarea>
-                    </div>
-                    <div class="mb-3" id="batchLeaderOption" style="display: none;">
-                        <label for="leaderSelect" class="form-label">选择组长</label>
-                        <select class="form-select" id="leaderSelect">
-                            <option value="">不设置组长</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="batchAddBtn">批量添加</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 修改积分模态框 -->
-    <div class="modal fade" id="modifyScoreModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">修改积分</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="studentSelect" class="form-label">选择学生</label>
-                        <select class="form-select" id="studentSelect"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">操作类型</label>
-                        <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="scoreOperation" id="addScore" value="add" checked>
-                                <label class="form-check-label" for="addScore">
-                                    增加积分
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="scoreOperation" id="deductScore" value="deduct">
-                                <label class="form-check-label" for="deductScore">
-                                    扣除积分
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="scorePoints" class="form-label">积分值</label>
-                        <input type="number" class="form-control" id="scorePoints" min="1" value="1">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="modifyScoreBtn">确认修改</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 学生转组模态框 -->
-    <div class="modal fade" id="moveStudentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">学生转组</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="moveStudentSelect" class="form-label">选择学生</label>
-                        <select class="form-select" id="moveStudentSelect"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">目标小组</label>
-                        <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="moveGroupOption" id="moveNoGroup" value="noGroup" checked>
-                                <label class="form-check-label" for="moveNoGroup">
-                                    不加入小组
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="moveGroupOption" id="moveExistingGroup" value="existingGroup">
-                                <label class="form-check-label" for="moveExistingGroup">
-                                    现有小组
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="moveGroupOption" id="moveNewGroup" value="newGroup">
-                                <label class="form-check-label" for="moveNewGroup">
-                                    创建新小组
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3" id="moveExistingGroupSelect" style="display: none;">
-                        <label for="moveGroupSelect" class="form-label">选择小组</label>
-                        <select class="form-select" id="moveGroupSelect"></select>
-                    </div>
-                    <div class="mb-3" id="moveLeaderOption" style="display: none;">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="keepLeader">
-                            <label class="form-check-label" for="keepLeader">
-                                继续担任组长
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="moveStudentBtn">确认转组</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 成功提示 -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="successToast" class="toast" role="alert">
-            <div class="toast-header bg-success text-white">
-                <strong class="me-auto">操作成功</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body">
-                操作已成功完成！
-            </div>
-        </div>
-    </div>
-
-    <!-- 脚本 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 学生类
-        class Student {
-            constructor(name, groupName, isLeader = false) {
-                this.name = name;
-                this.groupName = groupName;
-                this.initialScore = 5;
-                this.extraScore = 0;
-                this.isLeader = isLeader;
-                this.id = Date.now() + Math.random(); // 生成唯一ID
-            }
-            
-            getTotalScore() {
-                return this.initialScore + this.extraScore;
-            }
-            
-            addScore(points) {
-                this.extraScore += points;
-            }
-            
-            deductScore(points) {
-                if (this.initialScore >= points) {
-                    this.initialScore -= points;
-                } else {
-                    points -= this.initialScore;
-                    this.initialScore = 0;
-                    this.extraScore = Math.max(0, this.extraScore - points);
-                }
-            }
-        }
-
-        // 小组类
-        class Group {
-            constructor(name) {
-                this.name = name;
-                this.memberIds = []; // 存储学生ID
-            }
-            
-            getTotalScore(allStudents) {
-                let total = 0;
-                for (const id of this.memberIds) {
-                    const student = allStudents.find(s => s.id === id);
-                    if (student) {
-                        total += student.getTotalScore();
-                    }
-                }
-                return total;
-            }
-            
-            getLeader(allStudents) {
-                for (const id of this.memberIds) {
-                    const student = allStudents.find(s => s.id === id);
-                    if (student && student.isLeader) {
-                        return student;
-                    }
-                }
-                return null;
-            }
-        }
-
-        // 积分管理系统
-        class ScoreSystem {
-            constructor() {
-                this.students = [];
-                this.groups = [];
-                this.ungroupedStudentIds = [];
-                this.groupCounter = 1;
-                this.loadFromStorage();
-            }
-            
-            // 从本地存储加载数据
-            loadFromStorage() {
-                try {
-                    const data = localStorage.getItem('scoreSystemData');
-                    if (data) {
-                        const parsedData = JSON.parse(data);
-                        this.students = (parsedData.students || []).map(s => Object.assign(new Student(), s));
-                        this.groups = (parsedData.groups || []).map(g => Object.assign(new Group(), g));
-                        this.ungroupedStudentIds = parsedData.ungroupedStudentIds || [];
-                        this.groupCounter = parsedData.groupCounter || 1;
-                    }
-                } catch (e) {
-                    console.error("加载数据失败:", e);
-                    this.students = [];
-                    this.groups = [];
-                    this.ungroupedStudentIds = [];
-                    this.groupCounter = 1;
-                }
-            }
-            
-            // 保存数据到本地存储
-            saveToStorage() {
-                try {
-                    const data = {
-                        students: this.students,
-                        groups: this.groups,
-                        ungroupedStudentIds: this.ungroupedStudentIds,
-                        groupCounter: this.groupCounter
-                    };
-                    localStorage.setItem('scoreSystemData', JSON.stringify(data));
-                    return true;
-                } catch (e) {
-                    console.error("保存数据失败:", e);
-                    return false;
-                }
-            }
-            
-            // 查找小组
-            findGroup(groupName) {
-                return this.groups.findIndex(group => group.name === groupName);
-            }
-            
-            // 添加新小组
-            addGroup(groupName) {
-                this.groups.push(new Group(groupName));
-            }
-            
-            // 根据积分排序小组
-            sortGroupsByScore() {
-                this.groups.sort((a, b) => b.getTotalScore(this.students) - a.getTotalScore(this.students));
-            }
-            
-            // 从小组中移除学生
-            removeStudentFromGroup(studentId, groupName) {
-                const groupIndex = this.findGroup(groupName);
-                if (groupIndex === -1) return false;
-                
-                const memberIndex = this.groups[groupIndex].memberIds.indexOf(studentId);
-                if (memberIndex !== -1) {
-                    this.groups[groupIndex].memberIds.splice(memberIndex, 1);
-                    return true;
-                }
-                return false;
-            }
-            
-            // 添加新学生
-            addStudent(name, groupOption, selectedGroup = null, isLeader = false) {
-                let groupName = "无";
-                
-                if (groupOption === "existingGroup" && selectedGroup) {
-                    groupName = selectedGroup;
-                } else if (groupOption === "newGroup") {
-                    groupName = `第 ${this.groupCounter} 组`;
-                    this.addGroup(groupName);
-                    this.groupCounter++;
-                }
-                
-                // 创建学生
-                const student = new Student(name, groupName, isLeader);
-                this.students.push(student);
-                
-                // 添加到小组或未分组列表
-                if (groupName === "无") {
-                    this.ungroupedStudentIds.push(student.id);
-                } else {
-                    const groupIndex = this.findGroup(groupName);
-                    if (groupIndex !== -1) {
-                        this.groups[groupIndex].memberIds.push(student.id);
-                        
-                        // 如果是组长，检查是否已有组长
-                        if (isLeader) {
-                            const existingLeader = this.groups[groupIndex].getLeader(this.students);
-                            if (existingLeader && existingLeader.id !== student.id) {
-                                // 已经有组长，不能设置新的组长
-                                student.isLeader = false;
-                                return { student, success: false, message: `该小组已经有组长 ${existingLeader.name}，不能设置新的组长。` };
-                            }
-                        }
-                    }
-                }
-                
-                return { student, success: true };
-            }
-            
-            // 批量添加学生
-            addStudentsBatch(names, groupOption, selectedGroup = null) {
-                const addedStudents = [];
-                
-                // 确定目标小组
-                let targetGroup = "无";
-                let isNewGroup = false;
-                
-                if (groupOption === "existingGroup" && selectedGroup) {
-                    targetGroup = selectedGroup;
-                } else if (groupOption === "newGroup") {
-                    targetGroup = `第 ${this.groupCounter} 组`;
-                    this.addGroup(targetGroup);
-                    isNewGroup = true;
-                    this.groupCounter++;
-                }
-                
-                // 添加所有学生
-                for (const name of names) {
-                    const student = new Student(name, targetGroup, false);
-                    this.students.push(student);
-                    addedStudents.push(student);
-                    
-                    if (targetGroup === "无") {
-                        this.ungroupedStudentIds.push(student.id);
-                    } else {
-                        const groupIndex = this.findGroup(targetGroup);
-                        if (groupIndex !== -1) {
-                            this.groups[groupIndex].memberIds.push(student.id);
-                        }
-                    }
-                }
-                
-                return { addedStudents, targetGroup, isNewGroup };
-            }
-            
-            // 设置组长
-            setLeader(studentId, groupName) {
-                const groupIndex = this.findGroup(groupName);
-                if (groupIndex === -1) return false;
-                
-                // 检查是否已有组长
-                const existingLeader = this.groups[groupIndex].getLeader(this.students);
-                if (existingLeader) {
-                    // 取消原组长身份
-                    existingLeader.isLeader = false;
-                }
-                
-                // 设置新组长
-                const student = this.students.find(s => s.id === studentId);
-                if (student) {
-                    student.isLeader = true;
-                    return true;
-                }
-                
-                return false;
-            }
-            
-            // 修改学生积分
-            modifyScore(studentId, operation, points) {
-                const student = this.students.find(s => s.id === studentId);
-                if (!student) return false;
-                
-                if (operation === "add") {
-                    student.addScore(points);
-                } else if (operation === "deduct") {
-                    student.deductScore(points);
-                } else {
-                    return false;
-                }
-                
-                return true;
-            }
-            
-            // 学生转组
-            moveStudent(studentId, targetGroupOption, selectedGroup = null, keepLeader = false) {
-                const student = this.students.find(s => s.id === studentId);
-                if (!student) return false;
-                
-                const originalGroup = student.groupName;
-                
-                // 确定目标小组
-                let targetGroup = "无";
-                let isNewGroup = false;
-                
-                if (targetGroupOption === "existingGroup" && selectedGroup) {
-                    targetGroup = selectedGroup;
-                } else if (targetGroupOption === "newGroup") {
-                    targetGroup = `第 ${this.groupCounter} 组`;
-                    this.addGroup(targetGroup);
-                    isNewGroup = true;
-                    this.groupCounter++;
-                }
-                
-                // 从原位置移除
-                if (originalGroup === "无") {
-                    const index = this.ungroupedStudentIds.indexOf(studentId);
-                    if (index !== -1) {
-                        this.ungroupedStudentIds.splice(index, 1);
-                    }
-                } else {
-                    this.removeStudentFromGroup(studentId, originalGroup);
-                }
-                
-                // 添加到新位置
-                if (targetGroup === "无") {
-                    this.ungroupedStudentIds.push(studentId);
-                    student.groupName = "无";
-                    student.isLeader = false;
-                } else {
-                    const groupIndex = this.findGroup(targetGroup);
-                    if (groupIndex !== -1) {
-                        this.groups[groupIndex].memberIds.push(studentId);
-                        student.groupName = targetGroup;
-                        
-                        // 处理组长身份
-                        if (keepLeader) {
-                            // 检查目标小组是否已有组长
-                            const existingLeader = this.groups[groupIndex].getLeader(this.students);
-                            if (existingLeader && existingLeader.id !== studentId) {
-                                // 已经有组长，不能设置新的组长
-                                student.isLeader = false;
-                                keepLeader = false;
-                            } else {
-                                student.isLeader = true;
-                            }
-                        } else {
-                            student.isLeader = false;
-                        }
-                    }
-                }
-                
-                return { originalGroup, targetGroup, isNewGroup, keepLeader };
-            }
-            
-            // 获取所有学生（包括分组信息）
-            getAllStudents() {
-                return this.students.map(student => {
-                    const groupInfo = this.getStudentGroupInfo(student.id);
-                    return {
-                        ...student,
-                        isGrouped: groupInfo.isGrouped,
-                        displayGroup: groupInfo.groupName
-                    };
-                });
-            }
-            
-            // 获取学生所在小组信息
-            getStudentGroupInfo(studentId) {
-                // 检查是否在分组中
-                for (const group of this.groups) {
-                    if (group.memberIds.includes(studentId)) {
-                        return { groupName: group.name, isGrouped: true };
-                    }
-                }
-                
-                // 检查是否在未分组中
-                if (this.ungroupedStudentIds.includes(studentId)) {
-                    return { groupName: "无", isGrouped: false };
-                }
-                
-                return { groupName: "", isGrouped: false };
-            }
-            
-            // 重置数据
-            resetData() {
-                this.students = [];
-                this.groups = [];
-                this.ungroupedStudentIds = [];
-                this.groupCounter = 1;
-                this.saveToStorage();
-            }
-        }
-
-        // 初始化系统
-        const scoreSystem = new ScoreSystem();
-
-        // DOM 加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化UI
-            updateUI();
-            
-            // 添加学生按钮事件
-            document.getElementById('addStudentBtn').addEventListener('click', addStudentHandler);
-            
-            // 批量添加按钮事件
-            document.getElementById('batchAddBtn').addEventListener('click', batchAddHandler);
-            
-            // 修改积分按钮事件
-            document.getElementById('modifyScoreBtn').addEventListener('click', modifyScoreHandler);
-            
-            // 学生转组按钮事件
-            document.getElementById('moveStudentBtn').addEventListener('click', moveStudentHandler);
-            
-            // 保存数据按钮事件
-            document.getElementById('saveDataBtn').addEventListener('click', function() {
-                if (scoreSystem.saveToStorage()) {
-                    showToast('数据已成功保存！');
-                } else {
-                    alert('保存数据失败，请检查控制台获取详细信息。');
-                }
-            });
-            
-            // 重置数据按钮事件
-            document.getElementById('resetDataBtn').addEventListener('click', function() {
-                if (confirm('确定要重置所有数据吗？此操作不可撤销！')) {
-                    scoreSystem.resetData();
-                    updateUI();
-                    showToast('数据已重置！');
-                }
-            });
-            
-            // 小组分配选项变化事件
-            document.querySelectorAll('input[name="groupOption"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    toggleGroupOptions('groupOption', 'existingGroupSelect', 'leaderOption');
-                });
-            });
-            
-            document.querySelectorAll('input[name="batchGroupOption"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    toggleGroupOptions('batchGroupOption', 'batchExistingGroupSelect', 'batchLeaderOption');
-                });
-            });
-            
-            document.querySelectorAll('input[name="moveGroupOption"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    toggleGroupOptions('moveGroupOption', 'moveExistingGroupSelect', 'moveLeaderOption');
-                });
-            });
-            
-            // 初始化小组选择下拉框
-            updateGroupSelects();
-            updateStudentSelects();
+        // 切换登录/注册表单
+        document.getElementById('login-toggle').addEventListener('click', function() {
+            document.getElementById('login-form').classList.add('active');
+            document.getElementById('register-form').classList.remove('active');
+            document.getElementById('login-toggle').classList.add('active');
+            document.getElementById('register-toggle').classList.remove('active');
+            clearMessage();
         });
-
-        // 更新UI
-        function updateUI() {
-            updateGroupsRanking();
-            updateUngroupedStudents();
-            updateStatistics();
-            updateGroupSelects();
-            updateStudentSelects();
-        }
-
-        // 更新小组排名显示
-        function updateGroupsRanking() {
-            const container = document.getElementById('groupsRanking');
-            container.innerHTML = '';
+        
+        document.getElementById('register-toggle').addEventListener('click', function() {
+            document.getElementById('register-form').classList.add('active');
+            document.getElementById('login-form').classList.remove('active');
+            document.getElementById('register-toggle').classList.add('active');
+            document.getElementById('login-toggle').classList.remove('active');
+            clearMessage();
+        });
+        
+        // 登录表单提交
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
             
-            // 按积分排序小组
-            scoreSystem.sortGroupsByScore();
+            // 从本地存储获取用户数据
+            const users = JSON.parse(localStorage.getItem('teacherUsers')) || [];
+            const user = users.find(u => u.username === username && u.password === password);
             
-            if (scoreSystem.groups.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-4 text-muted" id="noGroupsMessage">
-                        <i class="fas fa-users fa-3x mb-3"></i>
-                        <p>暂无小组数据，请添加学生并分组</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            scoreSystem.groups.forEach((group, index) => {
-                const groupTotalScore = group.getTotalScore(scoreSystem.students);
-                const leader = group.getLeader(scoreSystem.students);
-                
-                const groupCard = document.createElement('div');
-                groupCard.className = 'card group-card mb-3';
-                
-                let leaderHtml = '';
-                if (leader) {
-                    const praise = leader.initialScore === 5 ? '<span class="praise"> ★表扬★</span>' : '';
-                    const criticism = leader.initialScore < 2 ? '<span class="criticism"> ※批评※</span>' : '';
-                    
-                    leaderHtml = `
-                        <div class="student-item bg-light">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="badge leader-badge me-2">组长</span>
-                                    <strong>${leader.name}</strong>
-                                </div>
-                                <div>
-                                    <span class="score-badge">${leader.getTotalScore()}分</span>
-                                    <small class="text-muted ms-2">(初始:${leader.initialScore}, 额外:${leader.extraScore})</small>
-                                    ${praise}${criticism}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                let membersHtml = '';
-                group.memberIds.forEach(memberId => {
-                    const student = scoreSystem.students.find(s => s.id === memberId);
-                    if (student && !student.isLeader) {
-                        const praise = student.initialScore === 5 ? '<span class="praise"> ★表扬★</span>' : '';
-                        const criticism = student.initialScore < 2 ? '<span class="criticism"> ※批评※</span>' : '';
-                        
-                        membersHtml += `
-                            <div class="student-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>${student.name}</div>
-                                    <div>
-                                        <span class="score-badge">${student.getTotalScore()}分</span>
-                                        <small class="text-muted ms-2">(初始:${student.initialScore}, 额外:${student.extraScore})</small>
-                                        ${praise}${criticism}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                
-                groupCard.innerHTML = `
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="group-rank">第${index + 1}名</span>
-                            <h5 class="mb-0 ms-2 d-inline">${group.name}</h5>
-                        </div>
-                        <div class="score-badge bg-primary text-white px-3 py-2 rounded">${groupTotalScore}分</div>
-                    </div>
-                    <div class="card-body">
-                        ${leaderHtml}
-                        ${membersHtml}
-                    </div>
-                `;
-                
-                container.appendChild(groupCard);
-            });
-        }
-
-        // 更新未分组学生显示
-        function updateUngroupedStudents() {
-            const container = document.getElementById('ungroupedStudentsList');
-            container.innerHTML = '';
-            
-            if (scoreSystem.ungroupedStudentIds.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-3 text-muted" id="noUngroupedMessage">
-                        <i class="fas fa-user-slash fa-2x mb-2"></i>
-                        <p>暂无未分组学生</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            scoreSystem.ungroupedStudentIds.forEach(studentId => {
-                const student = scoreSystem.students.find(s => s.id === studentId);
-                if (student) {
-                    const praise = student.initialScore === 5 ? '<span class="praise"> ★表扬★</span>' : '';
-                    const criticism = student.initialScore < 2 ? '<span class="criticism"> ※批评※</span>' : '';
-                    
-                    const studentItem = document.createElement('div');
-                    studentItem.className = 'student-item mb-2';
-                    studentItem.innerHTML = `
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>${student.name}</div>
-                            <div>
-                                <span class="score-badge">${student.getTotalScore()}分</span>
-                                <small class="text-muted ms-2">(初始:${student.initialScore}, 额外:${student.extraScore})</small>
-                                ${praise}${criticism}
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(studentItem);
-                }
-            });
-        }
-
-        // 更新统计信息
-        function updateStatistics() {
-            document.getElementById('totalGroups').textContent = scoreSystem.groups.length;
-            document.getElementById('totalStudents').textContent = scoreSystem.students.length;
-            document.getElementById('ungroupedStudents').textContent = scoreSystem.ungroupedStudentIds.length;
-            
-            let topScore = 0;
-            scoreSystem.groups.forEach(group => {
-                const groupScore = group.getTotalScore(scoreSystem.students);
-                if (groupScore > topScore) {
-                    topScore = groupScore;
-                }
-            });
-            document.getElementById('topGroupScore').textContent = topScore;
-        }
-
-        // 更新小组选择下拉框
-        function updateGroupSelects() {
-            const groupSelects = [
-                document.getElementById('groupSelect'),
-                document.getElementById('batchGroupSelect'),
-                document.getElementById('moveGroupSelect')
-            ];
-            
-            groupSelects.forEach(select => {
-                if (select) {
-                    select.innerHTML = '';
-                    scoreSystem.groups.forEach(group => {
-                        const option = document.createElement('option');
-                        option.value = group.name;
-                        option.textContent = group.name;
-                        select.appendChild(option);
-                    });
-                }
-            });
-        }
-
-        // 更新学生选择下拉框
-        function updateStudentSelects() {
-            const studentSelects = [
-                document.getElementById('studentSelect'),
-                document.getElementById('moveStudentSelect')
-            ];
-            
-            studentSelects.forEach(select => {
-                if (select) {
-                    select.innerHTML = '';
-                    
-                    // 添加分组学生
-                    scoreSystem.groups.forEach(group => {
-                        const groupStudents = scoreSystem.students.filter(student => 
-                            student.groupName === group.name
-                        );
-                        
-                        if (groupStudents.length > 0) {
-                            const optgroup = document.createElement('optgroup');
-                            optgroup.label = group.name;
-                            
-                            groupStudents.forEach(student => {
-                                const option = document.createElement('option');
-                                option.value = student.id;
-                                option.textContent = `${student.name}${student.isLeader ? ' (组长)' : ''} - ${student.getTotalScore()}分`;
-                                optgroup.appendChild(option);
-                            });
-                            
-                            select.appendChild(optgroup);
-                        }
-                    });
-                    
-                    // 添加未分组学生
-                    if (scoreSystem.ungroupedStudentIds.length > 0) {
-                        const optgroup = document.createElement('optgroup');
-                        optgroup.label = "未分组";
-                        
-                        scoreSystem.ungroupedStudentIds.forEach(studentId => {
-                            const student = scoreSystem.students.find(s => s.id === studentId);
-                            if (student) {
-                                const option = document.createElement('option');
-                                option.value = student.id;
-                                option.textContent = `${student.name} - ${student.getTotalScore()}分`;
-                                optgroup.appendChild(option);
-                            }
-                        });
-                        
-                        select.appendChild(optgroup);
-                    }
-                }
-            });
-        }
-
-        // 切换小组选项显示
-        function toggleGroupOptions(radioName, selectId, leaderId) {
-            const selectedValue = document.querySelector(`input[name="${radioName}"]:checked`).value;
-            const selectElement = document.getElementById(selectId);
-            const leaderElement = document.getElementById(leaderId);
-            
-            if (selectedValue === 'existingGroup') {
-                selectElement.style.display = 'block';
-                if (leaderElement) leaderElement.style.display = 'block';
+            if (user) {
+                showMessage('登录成功！正在跳转...', 'success');
+                // 在实际应用中，这里会跳转到主页面
+                setTimeout(() => {
+                    alert('登录成功！这里将跳转到班级管理页面。');
+                    // window.location.href = 'dashboard.html';
+                }, 1500);
             } else {
-                selectElement.style.display = 'none';
-                if (leaderElement) {
-                    if (selectedValue === 'noGroup') {
-                        leaderElement.style.display = 'none';
-                    } else {
-                        leaderElement.style.display = 'block';
-                    }
-                }
+                showMessage('用户名或密码错误！', 'error');
             }
-        }
-
-        // 添加学生处理函数
-        function addStudentHandler() {
-            const name = document.getElementById('studentName').value.trim();
-            if (!name) {
-                alert('请输入学生姓名！');
+        });
+        
+        // 注册表单提交
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            // 表单验证
+            if (password !== confirmPassword) {
+                showMessage('两次输入的密码不一致！', 'error');
                 return;
             }
             
-            const groupOption = document.querySelector('input[name="groupOption"]:checked').value;
-            let selectedGroup = null;
-            let isLeader = false;
-            
-            if (groupOption === 'existingGroup') {
-                selectedGroup = document.getElementById('groupSelect').value;
-                if (!selectedGroup) {
-                    alert('请选择小组！');
-                    return;
-                }
-                isLeader = document.getElementById('isLeader').checked;
-            } else if (groupOption === 'newGroup') {
-                isLeader = document.getElementById('isLeader').checked;
-            }
-            
-            const result = scoreSystem.addStudent(name, groupOption, selectedGroup, isLeader);
-            
-            if (result.success) {
-                scoreSystem.saveToStorage();
-                updateUI();
-                showToast(`学生 ${name} 添加成功！`);
-                
-                // 重置表单并关闭模态框
-                document.getElementById('studentName').value = '';
-                document.getElementById('isLeader').checked = false;
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
-                modal.hide();
-            } else {
-                alert(result.message);
-            }
-        }
-
-        // 批量添加处理函数
-        function batchAddHandler() {
-            const namesText = document.getElementById('studentNames').value.trim();
-            if (!namesText) {
-                alert('请输入学生姓名！');
+            if (password.length < 6) {
+                showMessage('密码长度至少为6位！', 'error');
                 return;
             }
             
-            const names = namesText.split('\n')
-                .map(name => name.trim())
-                .filter(name => name !== '');
+            // 从本地存储获取用户数据
+            const users = JSON.parse(localStorage.getItem('teacherUsers')) || [];
             
-            if (names.length === 0) {
-                alert('请输入有效的学生姓名！');
+            // 检查用户名是否已存在
+            if (users.some(u => u.username === username)) {
+                showMessage('用户名已存在！', 'error');
                 return;
             }
             
-            const groupOption = document.querySelector('input[name="batchGroupOption"]:checked').value;
-            let selectedGroup = null;
+            // 创建新用户
+            const newUser = {
+                username,
+                password
+            };
             
-            if (groupOption === 'existingGroup') {
-                selectedGroup = document.getElementById('batchGroupSelect').value;
-                if (!selectedGroup) {
-                    alert('请选择小组！');
-                    return;
-                }
-            }
+            users.push(newUser);
+            localStorage.setItem('teacherUsers', JSON.stringify(users));
             
-            const result = scoreSystem.addStudentsBatch(names, groupOption, selectedGroup);
+            showMessage('账号创建成功！请登录。', 'success');
             
-            // 如果有组长选项，更新组长选择下拉框
-            if (groupOption !== 'noGroup' && result.addedStudents.length > 0) {
-                const leaderSelect = document.getElementById('leaderSelect');
-                leaderSelect.innerHTML = '<option value="">不设置组长</option>';
-                
-                result.addedStudents.forEach((student, index) => {
-                    const option = document.createElement('option');
-                    option.value = student.id;
-                    option.textContent = `${index + 1}. ${student.name}`;
-                    leaderSelect.appendChild(option);
-                });
-                
-                // 显示组长选项
-                document.getElementById('batchLeaderOption').style.display = 'block';
-                
-                // 不关闭模态框，让用户选择组长
-                return;
-            }
-            
-            // 如果没有组长选项或没有添加学生，直接完成
-            completeBatchAdd();
+            // 切换到登录表单
+            setTimeout(() => {
+                document.getElementById('login-toggle').click();
+                document.getElementById('login-username').value = username;
+                document.getElementById('login-password').value = '';
+            }, 1500);
+        });
+        
+        // 显示消息函数
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
         }
-
-        // 完成批量添加
-        function completeBatchAdd() {
-            const leaderSelect = document.getElementById('leaderSelect');
-            const selectedLeaderId = leaderSelect.value;
-            
-            if (selectedLeaderId) {
-                const groupOption = document.querySelector('input[name="batchGroupOption"]:checked').value;
-                let targetGroup = "无";
-                
-                if (groupOption === 'existingGroup') {
-                    targetGroup = document.getElementById('batchGroupSelect').value;
-                } else if (groupOption === 'newGroup') {
-                    targetGroup = `第 ${scoreSystem.groupCounter - 1} 组`;
-                }
-                
-                const success = scoreSystem.setLeader(selectedLeaderId, targetGroup);
-                if (!success) {
-                    alert('设置组长失败！');
-                }
-            }
-            
-            scoreSystem.saveToStorage();
-            updateUI();
-            showToast('批量添加学生成功！');
-            
-            // 重置表单并关闭模态框
-            document.getElementById('studentNames').value = '';
-            document.getElementById('batchLeaderOption').style.display = 'none';
-            const modal = bootstrap.Modal.getInstance(document.getElementById('batchAddModal'));
-            modal.hide();
+        
+        // 清除消息函数
+        function clearMessage() {
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'none';
         }
-
-        // 修改积分处理函数
-        function modifyScoreHandler() {
-            const studentId = document.getElementById('studentSelect').value;
-            if (!studentId) {
-                alert('请选择学生！');
-                return;
+        
+        // 初始化：检查是否已有用户数据
+        window.addEventListener('load', function() {
+            if (!localStorage.getItem('teacherUsers')) {
+                // 如果没有用户数据，可以添加一些示例用户
+                const defaultUsers = [
+                    { username: 'teacher1', password: '123456' },
+                    { username: 'admin', password: 'admin123' }
+                ];
+                localStorage.setItem('teacherUsers', JSON.stringify(defaultUsers));
             }
-            
-            const operation = document.querySelector('input[name="scoreOperation"]:checked').value;
-            const points = parseInt(document.getElementById('scorePoints').value);
-            
-            if (isNaN(points) || points <= 0) {
-                alert('请输入有效的积分值！');
-                return;
-            }
-            
-            const success = scoreSystem.modifyScore(studentId, operation, points);
-            
-            if (success) {
-                scoreSystem.saveToStorage();
-                updateUI();
-                showToast('积分修改成功！');
-                
-                // 关闭模态框
-                const modal = bootstrap.Modal.getInstance(document.getElementById('modifyScoreModal'));
-                modal.hide();
-            } else {
-                alert('修改积分失败！');
-            }
-        }
-
-        // 学生转组处理函数
-        function moveStudentHandler() {
-            const studentId = document.getElementById('moveStudentSelect').value;
-            if (!studentId) {
-                alert('请选择学生！');
-                return;
-            }
-            
-            const targetGroupOption = document.querySelector('input[name="moveGroupOption"]:checked').value;
-            let selectedGroup = null;
-            let keepLeader = false;
-            
-            if (targetGroupOption === 'existingGroup') {
-                selectedGroup = document.getElementById('moveGroupSelect').value;
-                if (!selectedGroup) {
-                    alert('请选择小组！');
-                    return;
-                }
-                keepLeader = document.getElementById('keepLeader').checked;
-            } else if (targetGroupOption === 'newGroup') {
-                keepLeader = document.getElementById('keepLeader').checked;
-            }
-            
-            const result = scoreSystem.moveStudent(studentId, targetGroupOption, selectedGroup, keepLeader);
-            
-            if (result) {
-                scoreSystem.saveToStorage();
-                updateUI();
-                showToast('学生转组成功！');
-                
-                // 关闭模态框
-                const modal = bootstrap.Modal.getInstance(document.getElementById('moveStudentModal'));
-                modal.hide();
-            } else {
-                alert('学生转组失败！');
-            }
-        }
-
-        // 显示提示消息
-        function showToast(message) {
-            const toastEl = document.getElementById('successToast');
-            const toastBody = toastEl.querySelector('.toast-body');
-            toastBody.textContent = message;
-            
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-        }
+        });
     </script>
 </body>
 </html>
