@@ -14,6 +14,11 @@
         
         body {
             background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        /* 登录页面样式 */
+        .auth-container {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -101,7 +106,7 @@
             font-size: 14px;
         }
         
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
@@ -110,7 +115,7 @@
             transition: border 0.3s;
         }
         
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             border-color: #3a7bd5;
             outline: none;
         }
@@ -161,76 +166,548 @@
             font-size: 13px;
         }
         
-        @media (max-width: 480px) {
-            .container {
-                border-radius: 8px;
+        /* 主应用样式 */
+        .app-container {
+            display: none;
+        }
+        
+        .app-header {
+            background-color: #3a7bd5;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .nav-tab.active {
+            border-bottom-color: #3a7bd5;
+            color: #3a7bd5;
+            font-weight: 600;
+        }
+        
+        .content-area {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-title {
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        /* 班级管理样式 */
+        .class-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .class-info h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .class-info p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .class-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3a7bd5;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2d67c1;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f7fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #eaeef5;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .create-class-btn {
+            margin-bottom: 20px;
+        }
+        
+        /* 学生管理样式 */
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .student-table th, .student-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .student-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .student-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .add-student-btn {
+            margin-bottom: 15px;
+        }
+        
+        .bulk-import-btn {
+            margin-bottom: 15px;
+            margin-left: 10px;
+        }
+        
+        /* 排行榜样式 */
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .ranking-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .ranking-position {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3a7bd5;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .ranking-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
+        .ranking-info h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .ranking-info p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .ranking-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3a7bd5;
+        }
+        
+        /* 设置页面样式 */
+        .settings-form {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
             }
             
-            .form-container {
-                padding: 20px;
+            .class-card {
+                flex-direction: column;
+                align-items: flex-start;
             }
             
-            .header h1 {
-                font-size: 22px;
+            .class-actions {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .student-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>班级小组竞赛系统</h1>
-            <p>登录或创建账号，开始管理您的班级竞赛</p>
-        </div>
-        
-        <div class="form-container">
-            <div class="form-toggle">
-                <button class="toggle-btn active" id="login-toggle">登录</button>
-                <button class="toggle-btn" id="register-toggle">注册</button>
+    <!-- 登录/注册页面 -->
+    <div id="auth-container" class="auth-container">
+        <div class="container">
+            <div class="header">
+                <h1>班级小组竞赛系统</h1>
+                <p>登录或创建账号，开始管理您的班级竞赛</p>
             </div>
             
-            <form id="login-form" class="form active">
-                <div class="form-group">
-                    <label for="login-username">用户名</label>
-                    <input type="text" id="login-username" placeholder="请输入用户名" required>
+            <div class="form-container">
+                <div class="form-toggle">
+                    <button class="toggle-btn active" id="login-toggle">登录</button>
+                    <button class="toggle-btn" id="register-toggle">注册</button>
                 </div>
                 
-                <div class="form-group">
-                    <label for="login-password">密码</label>
-                    <input type="password" id="login-password" placeholder="请输入密码" required>
-                </div>
+                <form id="login-form" class="form active">
+                    <div class="form-group">
+                        <label for="login-username">用户名</label>
+                        <input type="text" id="login-username" placeholder="请输入用户名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" placeholder="请输入密码" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">登录</button>
+                </form>
                 
-                <button type="submit" class="submit-btn">登录</button>
-            </form>
+                <form id="register-form" class="form">
+                    <div class="form-group">
+                        <label for="register-username">用户名</label>
+                        <input type="text" id="register-username" placeholder="请设置用户名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" placeholder="请设置密码" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-confirm-password">确认密码</label>
+                        <input type="password" id="register-confirm-password" placeholder="请再次输入密码" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">创建账号</button>
+                </form>
+                
+                <div id="message" class="message"></div>
+                
+                <div class="footer">
+                    <p>© 2025班级小组竞赛系统 | 教师专用</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主应用页面 -->
+    <div id="app-container" class="app-container">
+        <div class="app-header">
+            <div class="app-title">班级小组竞赛系统</div>
+            <div class="user-info">
+                <span id="current-user">欢迎，老师</span>
+                <button id="logout-btn" class="logout-btn">退出登录</button>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-page="classes">班级管理</div>
+            <div class="nav-tab" data-page="students">学生管理</div>
+            <div class="nav-tab" data-page="ranking">积分排行榜</div>
+            <div class="nav-tab" data-page="settings">系统设置</div>
+        </div>
+        
+        <div class="content-area">
+            <!-- 班级管理页面 -->
+            <div id="classes-page" class="page active">
+                <h2 class="page-title">班级管理</h2>
+                <button id="create-class-btn" class="btn btn-primary create-class-btn">创建新班级</button>
+                <div id="classes-list">
+                    <!-- 班级列表将通过JS动态生成 -->
+                </div>
+            </div>
             
-            <form id="register-form" class="form">
+            <!-- 学生管理页面 -->
+            <div id="students-page" class="page">
+                <h2 class="page-title">学生管理</h2>
                 <div class="form-group">
-                    <label for="register-username">用户名</label>
-                    <input type="text" id="register-username" placeholder="请设置用户名" required>
+                    <label for="class-select">选择班级</label>
+                    <select id="class-select">
+                        <option value="">请选择班级</option>
+                        <!-- 班级选项将通过JS动态生成 -->
+                    </select>
                 </div>
-                
-                <div class="form-group">
-                    <label for="register-password">密码</label>
-                    <input type="password" id="register-password" placeholder="请设置密码" required>
+                <div id="student-management" style="display: none;">
+                    <button id="add-student-btn" class="btn btn-primary add-student-btn">添加学生</button>
+                    <button id="bulk-import-btn" class="btn btn-secondary bulk-import-btn">批量导入</button>
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>姓名</th>
+                                <th>小组编号</th>
+                                <th>初始积分</th>
+                                <th>额外积分</th>
+                                <th>是否为组长</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <!-- 学生列表将通过JS动态生成 -->
+                        </tbody>
+                    </table>
                 </div>
-                
-                <div class="form-group">
-                    <label for="register-confirm-password">确认密码</label>
-                    <input type="password" id="register-confirm-password" placeholder="请再次输入密码" required>
-                </div>
-                
-                <button type="submit" class="submit-btn">创建账号</button>
-            </form>
+            </div>
             
-            <div id="message" class="message"></div>
+            <!-- 积分排行榜页面 -->
+            <div id="ranking-page" class="page">
+                <h2 class="page-title">小组积分排行榜</h2>
+                <div class="form-group">
+                    <label for="ranking-class-select">选择班级</label>
+                    <select id="ranking-class-select">
+                        <option value="">请选择班级</option>
+                        <!-- 班级选项将通过JS动态生成 -->
+                    </select>
+                </div>
+                <div id="ranking-list" class="ranking-list">
+                    <!-- 排行榜将通过JS动态生成 -->
+                </div>
+            </div>
             
-            <div class="footer">
-                <p>© 2025班级小组竞赛系统 | 教师专用</p>
+            <!-- 设置页面 -->
+            <div id="settings-page" class="page">
+                <h2 class="page-title">系统设置</h2>
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="default-points">默认初始积分</label>
+                        <input type="number" id="default-points" min="1" value="5">
+                    </div>
+                    <button id="save-settings-btn" class="btn btn-primary">保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">标题</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 模态框内容将通过JS动态生成 -->
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <!-- 模态框按钮将通过JS动态生成 -->
             </div>
         </div>
     </div>
 
     <script>
+        // 数据模型
+        let currentUser = null;
+        let classes = JSON.parse(localStorage.getItem('classes')) || [];
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let settings = JSON.parse(localStorage.getItem('settings')) || { defaultPoints: 5 };
+        
+        // DOM元素
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const currentUserSpan = document.getElementById('current-user');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const pages = document.querySelectorAll('.page');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalFooter = document.getElementById('modal-footer');
+        const closeModalBtn = document.getElementById('close-modal');
+        
+        // 初始化设置
+        if (!localStorage.getItem('settings')) {
+            localStorage.setItem('settings', JSON.stringify(settings));
+        }
+        
         // 切换登录/注册表单
         document.getElementById('login-toggle').addEventListener('click', function() {
             document.getElementById('login-form').classList.add('active');
@@ -260,10 +737,13 @@
             
             if (user) {
                 showMessage('登录成功！正在跳转...', 'success');
-                // 在实际应用中，这里会跳转到主页面
+                currentUser = username;
+                currentUserSpan.textContent = `欢迎，${username}老师`;
+                
                 setTimeout(() => {
-                    alert('登录成功！这里将跳转到班级管理页面。');
-                    // window.location.href = 'dashboard.html';
+                    authContainer.style.display = 'none';
+                    appContainer.style.display = 'block';
+                    renderClassesPage();
                 }, 1500);
             } else {
                 showMessage('用户名或密码错误！', 'error');
@@ -316,6 +796,62 @@
             }, 1500);
         });
         
+        // 导航切换
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const pageId = this.getAttribute('data-page');
+                
+                // 更新导航状态
+                navTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 显示对应页面
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === `${pageId}-page`) {
+                        page.classList.add('active');
+                        
+                        // 根据页面类型渲染内容
+                        switch(pageId) {
+                            case 'classes':
+                                renderClassesPage();
+                                break;
+                            case 'students':
+                                renderStudentsPage();
+                                break;
+                            case 'ranking':
+                                renderRankingPage();
+                                break;
+                            case 'settings':
+                                renderSettingsPage();
+                                break;
+                        }
+                    }
+                });
+            });
+        });
+        
+        // 退出登录
+        logoutBtn.addEventListener('click', function() {
+            currentUser = null;
+            appContainer.style.display = 'none';
+            authContainer.style.display = 'flex';
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+        });
+        
+        // 关闭模态框
+        closeModalBtn.addEventListener('click', function() {
+            modal.classList.remove('active');
+        });
+        
+        // 点击模态框外部关闭
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        
         // 显示消息函数
         function showMessage(text, type) {
             const messageEl = document.getElementById('message');
@@ -330,6 +866,866 @@
             messageEl.style.display = 'none';
         }
         
+        // 渲染班级管理页面
+        function renderClassesPage() {
+            const classesList = document.getElementById('classes-list');
+            classesList.innerHTML = '';
+            
+            // 过滤当前老师的班级
+            const userClasses = classes.filter(c => c.teacher === currentUser);
+            
+            if (userClasses.length === 0) {
+                classesList.innerHTML = '<p>您还没有创建任何班级，请点击"创建新班级"按钮开始。</p>';
+                return;
+            }
+            
+            userClasses.forEach(classItem => {
+                const classCard = document.createElement('div');
+                classCard.className = 'class-card';
+                
+                const studentCount = students.filter(s => s.classId === classItem.id).length;
+                const groupCount = new Set(students.filter(s => s.classId === classItem.id).map(s => s.groupId)).size;
+                
+                classCard.innerHTML = `
+                    <div class="class-info">
+                        <h3>${classItem.name}</h3>
+                        <p>创建时间: ${new Date(classItem.createdAt).toLocaleDateString()} | 学生: ${studentCount}人 | 小组: ${groupCount}个</p>
+                    </div>
+                    <div class="class-actions">
+                        <button class="btn btn-secondary edit-class-btn" data-id="${classItem.id}">编辑</button>
+                        <button class="btn btn-danger delete-class-btn" data-id="${classItem.id}">删除</button>
+                    </div>
+                `;
+                
+                classesList.appendChild(classCard);
+            });
+            
+            // 添加事件监听器
+            document.querySelectorAll('.edit-class-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const classId = this.getAttribute('data-id');
+                    showEditClassModal(classId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-class-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const classId = this.getAttribute('data-id');
+                    showDeleteClassModal(classId);
+                });
+            });
+        }
+        
+        // 创建新班级
+        document.getElementById('create-class-btn').addEventListener('click', function() {
+            showCreateClassModal();
+        });
+        
+        // 显示创建班级模态框
+        function showCreateClassModal() {
+            modalTitle.textContent = '创建新班级';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="class-name">班级名称</label>
+                    <input type="text" id="class-name" placeholder="请输入班级名称" required>
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-create-class">取消</button>
+                <button class="btn btn-primary" id="confirm-create-class">创建</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-create-class').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-create-class').addEventListener('click', function() {
+                const className = document.getElementById('class-name').value.trim();
+                
+                if (!className) {
+                    alert('请输入班级名称');
+                    return;
+                }
+                
+                // 创建新班级
+                const newClass = {
+                    id: generateId(),
+                    name: className,
+                    teacher: currentUser,
+                    createdAt: new Date().toISOString()
+                };
+                
+                classes.push(newClass);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                modal.classList.remove('active');
+                renderClassesPage();
+            });
+        }
+        
+        // 显示编辑班级模态框
+        function showEditClassModal(classId) {
+            const classItem = classes.find(c => c.id === classId);
+            
+            modalTitle.textContent = '编辑班级';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="edit-class-name">班级名称</label>
+                    <input type="text" id="edit-class-name" value="${classItem.name}" required>
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-edit-class">取消</button>
+                <button class="btn btn-primary" id="confirm-edit-class">保存</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-edit-class').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-edit-class').addEventListener('click', function() {
+                const className = document.getElementById('edit-class-name').value.trim();
+                
+                if (!className) {
+                    alert('请输入班级名称');
+                    return;
+                }
+                
+                // 更新班级信息
+                classItem.name = className;
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                modal.classList.remove('active');
+                renderClassesPage();
+            });
+        }
+        
+        // 显示删除班级确认模态框
+        function showDeleteClassModal(classId) {
+            const classItem = classes.find(c => c.id === classId);
+            const classStudents = students.filter(s => s.classId === classId);
+            
+            modalTitle.textContent = '删除班级';
+            modalBody.innerHTML = `
+                <p>确定要删除班级"${classItem.name}"吗？</p>
+                <p>此操作将同时删除该班级下的${classStudents.length}名学生数据，且无法恢复。</p>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-delete-class">取消</button>
+                <button class="btn btn-danger" id="confirm-delete-class">删除</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-delete-class').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-delete-class').addEventListener('click', function() {
+                // 删除班级
+                classes = classes.filter(c => c.id !== classId);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                // 删除该班级的所有学生
+                students = students.filter(s => s.classId !== classId);
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderClassesPage();
+            });
+        }
+        
+        // 渲染学生管理页面
+        function renderStudentsPage() {
+            const classSelect = document.getElementById('class-select');
+            const studentManagement = document.getElementById('student-management');
+            
+            // 清空并重新填充班级选择框
+            classSelect.innerHTML = '<option value="">请选择班级</option>';
+            
+            const userClasses = classes.filter(c => c.teacher === currentUser);
+            userClasses.forEach(classItem => {
+                const option = document.createElement('option');
+                option.value = classItem.id;
+                option.textContent = classItem.name;
+                classSelect.appendChild(option);
+            });
+            
+            // 班级选择变化事件
+            classSelect.addEventListener('change', function() {
+                const classId = this.value;
+                
+                if (classId) {
+                    studentManagement.style.display = 'block';
+                    renderStudentsTable(classId);
+                } else {
+                    studentManagement.style.display = 'none';
+                }
+            });
+            
+            // 添加学生按钮事件
+            document.getElementById('add-student-btn').addEventListener('click', function() {
+                const classId = classSelect.value;
+                if (!classId) {
+                    alert('请先选择班级');
+                    return;
+                }
+                showAddStudentModal(classId);
+            });
+            
+            // 批量导入按钮事件
+            document.getElementById('bulk-import-btn').addEventListener('click', function() {
+                const classId = classSelect.value;
+                if (!classId) {
+                    alert('请先选择班级');
+                    return;
+                }
+                showBulkImportModal(classId);
+            });
+        }
+        
+        // 渲染学生表格
+        function renderStudentsTable(classId) {
+            const tableBody = document.getElementById('students-table-body');
+            tableBody.innerHTML = '';
+            
+            const classStudents = students.filter(s => s.classId === classId);
+            
+            if (classStudents.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">该班级暂无学生，请添加学生。</td></tr>';
+                return;
+            }
+            
+            classStudents.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.groupId}</td>
+                    <td>${student.initialPoints}</td>
+                    <td>${student.extraPoints}</td>
+                    <td>${student.isLeader ? '是' : '否'}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn btn-primary add-points-btn" data-id="${student.id}">加分</button>
+                        <button class="action-btn btn-danger deduct-points-btn" data-id="${student.id}">扣分</button>
+                        <button class="action-btn btn-secondary edit-student-btn" data-id="${student.id}">编辑</button>
+                        <button class="action-btn btn-danger delete-student-btn" data-id="${student.id}">删除</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // 添加事件监听器
+            document.querySelectorAll('.add-points-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    showAddPointsModal(studentId);
+                });
+            });
+            
+            document.querySelectorAll('.deduct-points-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    showDeductPointsModal(studentId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-student-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    showEditStudentModal(studentId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-student-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    showDeleteStudentModal(studentId);
+                });
+            });
+        }
+        
+        // 显示添加学生模态框
+        function showAddStudentModal(classId) {
+            modalTitle.textContent = '添加学生';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="student-name">学生姓名</label>
+                    <input type="text" id="student-name" placeholder="请输入学生姓名" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student-group">小组编号</label>
+                        <input type="number" id="student-group" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-initial-points">初始积分</label>
+                        <input type="number" id="student-initial-points" min="0" value="${settings.defaultPoints}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="student-is-leader"> 设为组长
+                    </label>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">注意：一个小组只能有一位组长</p>
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-add-student">取消</button>
+                <button class="btn btn-primary" id="confirm-add-student">添加</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-add-student').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-add-student').addEventListener('click', function() {
+                const name = document.getElementById('student-name').value.trim();
+                const groupId = parseInt(document.getElementById('student-group').value);
+                const initialPoints = parseInt(document.getElementById('student-initial-points').value);
+                const isLeader = document.getElementById('student-is-leader').checked;
+                
+                if (!name) {
+                    alert('请输入学生姓名');
+                    return;
+                }
+                
+                // 检查是否已经有组长
+                if (isLeader) {
+                    const existingLeader = students.find(s => 
+                        s.classId === classId && 
+                        s.groupId === groupId && 
+                        s.isLeader
+                    );
+                    
+                    if (existingLeader) {
+                        alert(`第${groupId}小组已经有组长：${existingLeader.name}，请先取消其组长身份`);
+                        return;
+                    }
+                }
+                
+                // 创建新学生
+                const newStudent = {
+                    id: generateId(),
+                    classId: classId,
+                    name: name,
+                    groupId: groupId,
+                    initialPoints: initialPoints,
+                    extraPoints: 0,
+                    isLeader: isLeader
+                };
+                
+                students.push(newStudent);
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderStudentsTable(classId);
+            });
+        }
+        
+        // 显示批量导入学生模态框
+        function showBulkImportModal(classId) {
+            modalTitle.textContent = '批量导入学生';
+            modalBody.innerHTML = `
+                <p>请输入学生信息，每行一个学生，格式：姓名,小组编号,初始积分,是否组长(Y/N)</p>
+                <p style="font-size: 12px; color: #666;">例如：张三,1,5,Y</p>
+                <div class="form-group">
+                    <textarea id="bulk-students-data" rows="10" placeholder="张三,1,5,Y&#10;李四,1,5,N&#10;王五,2,5,Y"></textarea>
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-bulk-import">取消</button>
+                <button class="btn btn-primary" id="confirm-bulk-import">导入</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-bulk-import').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-bulk-import').addEventListener('click', function() {
+                const data = document.getElementById('bulk-students-data').value.trim();
+                
+                if (!data) {
+                    alert('请输入学生数据');
+                    return;
+                }
+                
+                const lines = data.split('\n');
+                const newStudents = [];
+                const errors = [];
+                
+                // 记录每个小组的组长
+                const groupLeaders = {};
+                
+                lines.forEach((line, index) => {
+                    const parts = line.split(',');
+                    
+                    if (parts.length !== 4) {
+                        errors.push(`第${index + 1}行：格式不正确，应为4个字段`);
+                        return;
+                    }
+                    
+                    const name = parts[0].trim();
+                    const groupId = parseInt(parts[1].trim());
+                    const initialPoints = parseInt(parts[2].trim());
+                    const isLeader = parts[3].trim().toUpperCase() === 'Y';
+                    
+                    if (!name) {
+                        errors.push(`第${index + 1}行：学生姓名不能为空`);
+                        return;
+                    }
+                    
+                    if (isNaN(groupId) || groupId < 1) {
+                        errors.push(`第${index + 1}行：小组编号必须为正整数`);
+                        return;
+                    }
+                    
+                    if (isNaN(initialPoints) || initialPoints < 0) {
+                        errors.push(`第${index + 1}行：初始积分必须为非负整数`);
+                        return;
+                    }
+                    
+                    // 检查组长冲突
+                    if (isLeader) {
+                        if (groupLeaders[groupId]) {
+                            errors.push(`第${index + 1}行：第${groupId}小组已经有组长`);
+                            return;
+                        }
+                        groupLeaders[groupId] = true;
+                    }
+                    
+                    // 检查现有学生中是否有组长冲突
+                    const existingLeader = students.find(s => 
+                        s.classId === classId && 
+                        s.groupId === groupId && 
+                        s.isLeader
+                    );
+                    
+                    if (isLeader && existingLeader) {
+                        errors.push(`第${index + 1}行：第${groupId}小组已经有组长：${existingLeader.name}`);
+                        return;
+                    }
+                    
+                    newStudents.push({
+                        id: generateId(),
+                        classId: classId,
+                        name: name,
+                        groupId: groupId,
+                        initialPoints: initialPoints,
+                        extraPoints: 0,
+                        isLeader: isLeader
+                    });
+                });
+                
+                if (errors.length > 0) {
+                    alert('导入失败，请检查以下错误：\n' + errors.join('\n'));
+                    return;
+                }
+                
+                // 添加新学生
+                students.push(...newStudents);
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderStudentsTable(classId);
+                
+                alert(`成功导入${newStudents.length}名学生`);
+            });
+        }
+        
+        // 显示加分模态框
+        function showAddPointsModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            
+            modalTitle.textContent = '为学生加分';
+            modalBody.innerHTML = `
+                <p>学生：${student.name}</p>
+                <div class="form-group">
+                    <label for="add-points-amount">加分数量</label>
+                    <input type="number" id="add-points-amount" min="1" value="1" required>
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-add-points">取消</button>
+                <button class="btn btn-primary" id="confirm-add-points">确认加分</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-add-points').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-add-points').addEventListener('click', function() {
+                const amount = parseInt(document.getElementById('add-points-amount').value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    alert('请输入有效的加分数量');
+                    return;
+                }
+                
+                // 加分到额外积分
+                student.extraPoints += amount;
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderStudentsTable(student.classId);
+                
+                alert(`成功为${student.name}加${amount}分`);
+            });
+        }
+        
+        // 显示扣分模态框
+        function showDeductPointsModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            const classStudents = students.filter(s => s.classId === student.classId);
+            const groupStudents = classStudents.filter(s => s.groupId === student.groupId && s.id !== studentId);
+            
+            modalTitle.textContent = '为学生扣分';
+            modalBody.innerHTML = `
+                <p>学生：${student.name}</p>
+                <p>当前积分：初始${student.initialPoints} + 额外${student.extraPoints} = ${student.initialPoints + student.extraPoints}</p>
+                <div class="form-group">
+                    <label for="deduct-points-amount">扣分数量</label>
+                    <input type="number" id="deduct-points-amount" min="1" value="1" required>
+                </div>
+                <div id="deduct-info" style="font-size: 12px; color: #666; margin-top: 10px;"></div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-deduct-points">取消</button>
+                <button class="btn btn-danger" id="confirm-deduct-points">确认扣分</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            // 实时计算扣分影响
+            const deductAmountInput = document.getElementById('deduct-points-amount');
+            const deductInfo = document.getElementById('deduct-info');
+            
+            function updateDeductInfo() {
+                const amount = parseInt(deductAmountInput.value) || 0;
+                
+                if (amount <= 0) {
+                    deductInfo.innerHTML = '';
+                    return;
+                }
+                
+                let info = '';
+                
+                if (amount <= student.initialPoints) {
+                    info = `扣分后：${student.name}的初始积分将变为${student.initialPoints - amount}`;
+                } else {
+                    const remaining = amount - student.initialPoints;
+                    info = `扣分后：${student.name}的初始积分将变为0，剩余的${remaining}分将随机分配给同小组的其他${groupStudents.length}名同学`;
+                }
+                
+                deductInfo.innerHTML = info;
+            }
+            
+            deductAmountInput.addEventListener('input', updateDeductInfo);
+            updateDeductInfo();
+            
+            document.getElementById('cancel-deduct-points').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-deduct-points').addEventListener('click', function() {
+                const amount = parseInt(document.getElementById('deduct-points-amount').value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    alert('请输入有效的扣分数量');
+                    return;
+                }
+                
+                // 扣分逻辑
+                if (amount <= student.initialPoints) {
+                    // 直接从初始积分扣除
+                    student.initialPoints -= amount;
+                } else {
+                    // 先扣完初始积分
+                    const remaining = amount - student.initialPoints;
+                    student.initialPoints = 0;
+                    
+                    // 剩余的分数随机分配给同小组其他成员
+                    if (groupStudents.length > 0) {
+                        const pointsPerStudent = Math.floor(remaining / groupStudents.length);
+                        let extraPoints = remaining % groupStudents.length;
+                        
+                        // 随机分配
+                        const shuffledStudents = [...groupStudents].sort(() => Math.random() - 0.5);
+                        
+                        shuffledStudents.forEach(s => {
+                            const deductAmount = pointsPerStudent + (extraPoints > 0 ? 1 : 0);
+                            if (deductAmount > 0) {
+                                s.initialPoints = Math.max(0, s.initialPoints - deductAmount);
+                                if (extraPoints > 0) extraPoints--;
+                            }
+                        });
+                    }
+                }
+                
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderStudentsTable(student.classId);
+                
+                alert(`成功为${student.name}扣${amount}分`);
+            });
+        }
+        
+        // 显示编辑学生模态框
+        function showEditStudentModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            const classStudents = students.filter(s => s.classId === student.classId);
+            
+            modalTitle.textContent = '编辑学生信息';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="edit-student-name">学生姓名</label>
+                    <input type="text" id="edit-student-name" value="${student.name}" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-student-group">小组编号</label>
+                        <input type="number" id="edit-student-group" min="1" value="${student.groupId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-student-initial-points">初始积分</label>
+                        <input type="number" id="edit-student-initial-points" min="0" value="${student.initialPoints}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="edit-student-is-leader" ${student.isLeader ? 'checked' : ''}> 设为组长
+                    </label>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">注意：一个小组只能有一位组长</p>
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-edit-student">取消</button>
+                <button class="btn btn-primary" id="confirm-edit-student">保存</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-edit-student').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-edit-student').addEventListener('click', function() {
+                const name = document.getElementById('edit-student-name').value.trim();
+                const groupId = parseInt(document.getElementById('edit-student-group').value);
+                const initialPoints = parseInt(document.getElementById('edit-student-initial-points').value);
+                const isLeader = document.getElementById('edit-student-is-leader').checked;
+                
+                if (!name) {
+                    alert('请输入学生姓名');
+                    return;
+                }
+                
+                // 检查是否已经有组长（如果修改了小组或组长状态）
+                if (isLeader && (groupId !== student.groupId || !student.isLeader)) {
+                    const existingLeader = classStudents.find(s => 
+                        s.groupId === groupId && 
+                        s.isLeader &&
+                        s.id !== studentId
+                    );
+                    
+                    if (existingLeader) {
+                        alert(`第${groupId}小组已经有组长：${existingLeader.name}，请先取消其组长身份`);
+                        return;
+                    }
+                }
+                
+                // 更新学生信息
+                student.name = name;
+                student.groupId = groupId;
+                student.initialPoints = initialPoints;
+                student.isLeader = isLeader;
+                
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderStudentsTable(student.classId);
+            });
+        }
+        
+        // 显示删除学生确认模态框
+        function showDeleteStudentModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            
+            modalTitle.textContent = '删除学生';
+            modalBody.innerHTML = `
+                <p>确定要删除学生"${student.name}"吗？</p>
+                <p>此操作无法恢复。</p>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-delete-student">取消</button>
+                <button class="btn btn-danger" id="confirm-delete-student">删除</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('cancel-delete-student').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-delete-student').addEventListener('click', function() {
+                const classId = student.classId;
+                
+                // 删除学生
+                students = students.filter(s => s.id !== studentId);
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderStudentsTable(classId);
+            });
+        }
+        
+        // 渲染积分排行榜页面
+        function renderRankingPage() {
+            const classSelect = document.getElementById('ranking-class-select');
+            const rankingList = document.getElementById('ranking-list');
+            
+            // 清空并重新填充班级选择框
+            classSelect.innerHTML = '<option value="">请选择班级</option>';
+            
+            const userClasses = classes.filter(c => c.teacher === currentUser);
+            userClasses.forEach(classItem => {
+                const option = document.createElement('option');
+                option.value = classItem.id;
+                option.textContent = classItem.name;
+                classSelect.appendChild(option);
+            });
+            
+            // 班级选择变化事件
+            classSelect.addEventListener('change', function() {
+                const classId = this.value;
+                
+                if (classId) {
+                    renderRanking(classId);
+                } else {
+                    rankingList.innerHTML = '<p>请选择班级查看排行榜</p>';
+                }
+            });
+            
+            // 初始状态
+            rankingList.innerHTML = '<p>请选择班级查看排行榜</p>';
+        }
+        
+        // 渲染排行榜
+        function renderRanking(classId) {
+            const rankingList = document.getElementById('ranking-list');
+            rankingList.innerHTML = '';
+            
+            const classStudents = students.filter(s => s.classId === classId);
+            
+            if (classStudents.length === 0) {
+                rankingList.innerHTML = '<p>该班级暂无学生数据</p>';
+                return;
+            }
+            
+            // 计算每个小组的总积分
+            const groupScores = {};
+            
+            classStudents.forEach(student => {
+                const groupId = student.groupId;
+                if (!groupScores[groupId]) {
+                    groupScores[groupId] = {
+                        totalScore: 0,
+                        students: []
+                    };
+                }
+                
+                const studentScore = student.initialPoints + student.extraPoints;
+                groupScores[groupId].totalScore += studentScore;
+                groupScores[groupId].students.push({
+                    name: student.name,
+                    score: studentScore,
+                    isLeader: student.isLeader
+                });
+            });
+            
+            // 转换为数组并排序
+            const sortedGroups = Object.entries(groupScores)
+                .map(([groupId, data]) => ({
+                    groupId: parseInt(groupId),
+                    totalScore: data.totalScore,
+                    students: data.students
+                }))
+                .sort((a, b) => b.totalScore - a.totalScore);
+            
+            if (sortedGroups.length === 0) {
+                rankingList.innerHTML = '<p>暂无小组数据</p>';
+                return;
+            }
+            
+            // 渲染排行榜
+            sortedGroups.forEach((group, index) => {
+                const rankingItem = document.createElement('div');
+                rankingItem.className = 'ranking-item';
+                
+                // 生成学生列表HTML
+                let studentsHtml = '';
+                group.students.forEach(student => {
+                    studentsHtml += `<span>${student.name}${student.isLeader ? '(组长)' : ''}(${student.score}分)</span> `;
+                });
+                
+                rankingItem.innerHTML = `
+                    <div class="ranking-position">${index + 1}</div>
+                    <div class="ranking-info">
+                        <h3>第${group.groupId}小组</h3>
+                        <p>${studentsHtml}</p>
+                    </div>
+                    <div class="ranking-score">${group.totalScore}分</div>
+                `;
+                
+                rankingList.appendChild(rankingItem);
+            });
+        }
+        
+        // 渲染设置页面
+        function renderSettingsPage() {
+            document.getElementById('default-points').value = settings.defaultPoints;
+            
+            // 保存设置按钮事件
+            document.getElementById('save-settings-btn').addEventListener('click', function() {
+                const defaultPoints = parseInt(document.getElementById('default-points').value);
+                
+                if (isNaN(defaultPoints) || defaultPoints < 1) {
+                    alert('请输入有效的默认初始积分');
+                    return;
+                }
+                
+                settings.defaultPoints = defaultPoints;
+                localStorage.setItem('settings', JSON.stringify(settings));
+                
+                alert('设置已保存');
+            });
+        }
+        
+        // 生成唯一ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
         // 初始化：检查是否已有用户数据
         window.addEventListener('load', function() {
             if (!localStorage.getItem('teacherUsers')) {
@@ -339,6 +1735,61 @@
                     { username: 'admin', password: 'admin123' }
                 ];
                 localStorage.setItem('teacherUsers', JSON.stringify(defaultUsers));
+            }
+            
+            // 如果有示例数据，可以在这里添加
+            if (classes.length === 0) {
+                // 添加示例班级
+                const exampleClass = {
+                    id: generateId(),
+                    name: '示例班级',
+                    teacher: 'teacher1',
+                    createdAt: new Date().toISOString()
+                };
+                classes.push(exampleClass);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                // 添加示例学生
+                const exampleStudents = [
+                    {
+                        id: generateId(),
+                        classId: exampleClass.id,
+                        name: '张三',
+                        groupId: 1,
+                        initialPoints: 5,
+                        extraPoints: 2,
+                        isLeader: true
+                    },
+                    {
+                        id: generateId(),
+                        classId: exampleClass.id,
+                        name: '李四',
+                        groupId: 1,
+                        initialPoints: 5,
+                        extraPoints: 1,
+                        isLeader: false
+                    },
+                    {
+                        id: generateId(),
+                        classId: exampleClass.id,
+                        name: '王五',
+                        groupId: 2,
+                        initialPoints: 5,
+                        extraPoints: 3,
+                        isLeader: true
+                    },
+                    {
+                        id: generateId(),
+                        classId: exampleClass.id,
+                        name: '赵六',
+                        groupId: 2,
+                        initialPoints: 5,
+                        extraPoints: 0,
+                        isLeader: false
+                    }
+                ];
+                students.push(...exampleStudents);
+                localStorage.setItem('students', JSON.stringify(students));
             }
         });
     </script>
