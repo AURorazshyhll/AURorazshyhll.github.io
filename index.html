@@ -314,6 +314,15 @@
             background-color: #c0392b;
         }
         
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d68910;
+        }
+        
         .create-class-btn {
             margin-bottom: 20px;
         }
@@ -412,6 +421,12 @@
             color: #3a7bd5;
         }
         
+        .ranking-actions {
+            margin-left: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
         /* 设置页面样式 */
         .settings-form {
             background: white;
@@ -429,6 +444,17 @@
         .form-row .form-group {
             flex: 1;
             margin-bottom: 0;
+        }
+        
+        .danger-zone {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .danger-zone h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
         }
         
         /* 模态框样式 */
@@ -493,6 +519,31 @@
             gap: 10px;
         }
         
+        /* 快速修改积分表格样式 */
+        .quick-edit-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .quick-edit-table th, .quick-edit-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .quick-edit-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .quick-edit-table input {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .nav-tabs {
@@ -519,6 +570,18 @@
             .form-row {
                 flex-direction: column;
                 gap: 0;
+            }
+            
+            .ranking-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .ranking-actions {
+                margin-top: 10px;
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-end;
             }
         }
     </style>
@@ -662,6 +725,12 @@
                         <input type="number" id="default-points" min="1" value="5">
                     </div>
                     <button id="save-settings-btn" class="btn btn-primary">保存设置</button>
+                    
+                    <div class="danger-zone">
+                        <h3>危险区域</h3>
+                        <p>此操作将永久删除您的账户及所有相关数据，无法恢复。</p>
+                        <button id="delete-account-btn" class="btn btn-danger">注销账号</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1695,9 +1764,112 @@
                         <p>${studentsHtml}</p>
                     </div>
                     <div class="ranking-score">${group.totalScore}分</div>
+                    <div class="ranking-actions">
+                        <button class="btn btn-warning quick-edit-btn" data-class="${classId}" data-group="${group.groupId}">快速修改积分</button>
+                    </div>
                 `;
                 
                 rankingList.appendChild(rankingItem);
+            });
+            
+            // 添加快速修改积分按钮事件
+            document.querySelectorAll('.quick-edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const classId = this.getAttribute('data-class');
+                    const groupId = parseInt(this.getAttribute('data-group'));
+                    showQuickEditPointsModal(classId, groupId);
+                });
+            });
+        }
+        
+        // 显示快速修改积分模态框
+        function showQuickEditPointsModal(classId, groupId) {
+            const classStudents = students.filter(s => s.classId === classId && s.groupId === groupId);
+            const className = classes.find(c => c.id === classId).name;
+            
+            modalTitle.textContent = `快速修改积分 - 第${groupId}小组`;
+            modalBody.innerHTML = `
+                <p>班级：${className} | 小组：第${groupId}小组</p>
+                <table class="quick-edit-table">
+                    <thead>
+                        <tr>
+                            <th>学生姓名</th>
+                            <th>初始积分</th>
+                            <th>额外积分</th>
+                            <th>总积分</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quick-edit-table-body">
+                        ${classStudents.map(student => `
+                            <tr>
+                                <td>${student.name}${student.isLeader ? ' (组长)' : ''}</td>
+                                <td><input type="number" class="initial-points-input" data-id="${student.id}" value="${student.initialPoints}" min="0"></td>
+                                <td><input type="number" class="extra-points-input" data-id="${student.id}" value="${student.extraPoints}" min="0"></td>
+                                <td>${student.initialPoints + student.extraPoints}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div id="quick-edit-total" style="margin-top: 10px; font-weight: bold; text-align: right;">
+                    小组总积分: ${classStudents.reduce((sum, student) => sum + student.initialPoints + student.extraPoints, 0)}
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-quick-edit">取消</button>
+                <button class="btn btn-primary" id="confirm-quick-edit">保存修改</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            // 实时计算总积分
+            const initialPointsInputs = document.querySelectorAll('.initial-points-input');
+            const extraPointsInputs = document.querySelectorAll('.extra-points-input');
+            const totalDisplay = document.getElementById('quick-edit-total');
+            
+            function updateTotal() {
+                let total = 0;
+                initialPointsInputs.forEach(input => {
+                    total += parseInt(input.value) || 0;
+                });
+                extraPointsInputs.forEach(input => {
+                    total += parseInt(input.value) || 0;
+                });
+                totalDisplay.textContent = `小组总积分: ${total}`;
+            }
+            
+            initialPointsInputs.forEach(input => {
+                input.addEventListener('input', updateTotal);
+            });
+            
+            extraPointsInputs.forEach(input => {
+                input.addEventListener('input', updateTotal);
+            });
+            
+            document.getElementById('cancel-quick-edit').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-quick-edit').addEventListener('click', function() {
+                // 更新学生积分
+                initialPointsInputs.forEach(input => {
+                    const studentId = input.getAttribute('data-id');
+                    const student = students.find(s => s.id === studentId);
+                    student.initialPoints = parseInt(input.value) || 0;
+                });
+                
+                extraPointsInputs.forEach(input => {
+                    const studentId = input.getAttribute('data-id');
+                    const student = students.find(s => s.id === studentId);
+                    student.extraPoints = parseInt(input.value) || 0;
+                });
+                
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                renderRanking(classId);
+                
+                alert(`第${groupId}小组积分已更新`);
             });
         }
         
@@ -1718,6 +1890,85 @@
                 localStorage.setItem('settings', JSON.stringify(settings));
                 
                 alert('设置已保存');
+            });
+            
+            // 注销账号按钮事件
+            document.getElementById('delete-account-btn').addEventListener('click', function() {
+                showDeleteAccountModal();
+            });
+        }
+        
+        // 显示注销账号确认模态框
+        function showDeleteAccountModal() {
+            modalTitle.textContent = '注销账号';
+            modalBody.innerHTML = `
+                <p>确定要注销账号"${currentUser}"吗？</p>
+                <p style="color: #e74c3c; font-weight: bold;">警告：此操作将永久删除您的账户及所有相关数据，包括：</p>
+                <ul style="margin-left: 20px; color: #e74c3c;">
+                    <li>您的用户账号</li>
+                    <li>您创建的所有班级</li>
+                    <li>所有学生数据</li>
+                </ul>
+                <p style="margin-top: 15px;">此操作无法撤销，请谨慎操作！</p>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="confirm-username">请输入您的用户名以确认：</label>
+                    <input type="text" id="confirm-username" placeholder="请输入您的用户名">
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="cancel-delete-account">取消</button>
+                <button class="btn btn-danger" id="confirm-delete-account" disabled>确认注销</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            // 用户名确认逻辑
+            const confirmUsernameInput = document.getElementById('confirm-username');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-account');
+            
+            confirmUsernameInput.addEventListener('input', function() {
+                confirmDeleteBtn.disabled = this.value !== currentUser;
+            });
+            
+            document.getElementById('cancel-delete-account').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById('confirm-delete-account').addEventListener('click', function() {
+                if (confirmUsernameInput.value !== currentUser) {
+                    alert('用户名不匹配，请重新输入');
+                    return;
+                }
+                
+                // 获取所有用户
+                const users = JSON.parse(localStorage.getItem('teacherUsers')) || [];
+                
+                // 删除当前用户
+                const updatedUsers = users.filter(u => u.username !== currentUser);
+                localStorage.setItem('teacherUsers', JSON.stringify(updatedUsers));
+                
+                // 删除该用户的所有班级
+                classes = classes.filter(c => c.teacher !== currentUser);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                // 删除该用户的所有学生
+                students = students.filter(s => {
+                    const classItem = classes.find(c => c.id === s.classId);
+                    return classItem && classItem.teacher === currentUser;
+                });
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                modal.classList.remove('active');
+                
+                // 退出登录
+                currentUser = null;
+                appContainer.style.display = 'none';
+                authContainer.style.display = 'flex';
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                
+                alert('账号已成功注销');
             });
         }
         
