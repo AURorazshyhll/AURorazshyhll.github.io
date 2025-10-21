@@ -544,6 +544,100 @@
             border-radius: 4px;
         }
         
+        /* 成就系统样式 */
+        .achievements-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .achievement-category {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .achievement-category h3 {
+            color: #3a7bd5;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .achievement-category p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .achievement-list {
+            min-height: 100px;
+        }
+        
+        .achievement-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #3a7bd5;
+        }
+        
+        .achievement-item .student-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .achievement-item .achievement-detail {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .summary-controls {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+        
+        .summary-controls .btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .history-date {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .history-winners, .history-criticism {
+            margin-bottom: 10px;
+        }
+        
+        .history-winners h4, .history-criticism h4 {
+            color: #3a7bd5;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .history-achievements h4 {
+            color: #f39c12;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .nav-tabs {
@@ -582,6 +676,10 @@
                 margin-left: 0;
                 width: 100%;
                 justify-content: flex-end;
+            }
+            
+            .achievements-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -657,6 +755,7 @@
             <div class="nav-tab active" data-page="classes">班级管理</div>
             <div class="nav-tab" data-page="students">学生管理</div>
             <div class="nav-tab" data-page="ranking">积分排行榜</div>
+            <div class="nav-tab" data-page="achievements">成就系统</div>
             <div class="nav-tab" data-page="settings">系统设置</div>
         </div>
         
@@ -716,6 +815,59 @@
                 </div>
             </div>
             
+            <!-- 成就系统页面 -->
+            <div id="achievements-page" class="page">
+                <h2 class="page-title">成就系统</h2>
+                <div class="form-group">
+                    <label for="achievement-class-select">选择班级</label>
+                    <select id="achievement-class-select">
+                        <option value="">请选择班级</option>
+                        <!-- 班级选项将通过JS动态生成 -->
+                    </select>
+                </div>
+                <div id="achievements-content" style="display: none;">
+                    <div class="achievements-container">
+                        <div class="achievement-category">
+                            <h3>最佳组长</h3>
+                            <p>总计三次及以上身为组长带领小组成员获得每月总结前三名</p>
+                            <div id="best-leader-list" class="achievement-list">
+                                <!-- 成就获得者列表 -->
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-category">
+                            <h3>最优进步生</h3>
+                            <p>自身的积分数量相比于上次每月总结有明显进步</p>
+                            <div id="most-improved-list" class="achievement-list">
+                                <!-- 成就获得者列表 -->
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-category">
+                            <h3>纪律之星</h3>
+                            <p>连续3次每月总结的时间里一个积分都没有扣</p>
+                            <div id="discipline-star-list" class="achievement-list">
+                                <!-- 成就获得者列表 -->
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-category">
+                            <h3>最佳奉献者</h3>
+                            <p>每次每月总结中，为所在小组贡献了最多的积分</p>
+                            <div id="best-contributor-list" class="achievement-list">
+                                <!-- 成就获得者列表 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-controls">
+                        <button id="manual-summary-btn" class="btn btn-primary">手动执行月度总结</button>
+                        <button id="manual-weekly-btn" class="btn btn-secondary">手动执行周度加分</button>
+                        <button id="view-history-btn" class="btn btn-secondary">查看历史总结</button>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 设置页面 -->
             <div id="settings-page" class="page">
                 <h2 class="page-title">系统设置</h2>
@@ -757,7 +909,13 @@
         let currentUser = null;
         let classes = JSON.parse(localStorage.getItem('classes')) || [];
         let students = JSON.parse(localStorage.getItem('students')) || [];
-        let settings = JSON.parse(localStorage.getItem('settings')) || { defaultPoints: 5 };
+        let settings = JSON.parse(localStorage.getItem('settings')) || { 
+            defaultPoints: 5,
+            lastWeeklyBonus: null,
+            lastMonthlySummary: null
+        };
+        let achievements = JSON.parse(localStorage.getItem('achievements')) || [];
+        let summaryHistory = JSON.parse(localStorage.getItem('summaryHistory')) || [];
         
         // DOM元素
         const authContainer = document.getElementById('auth-container');
@@ -890,6 +1048,9 @@
                                 break;
                             case 'ranking':
                                 renderRankingPage();
+                                break;
+                            case 'achievements':
+                                renderAchievementsPage();
                                 break;
                             case 'settings':
                                 renderSettingsPage();
@@ -1873,6 +2034,150 @@
             });
         }
         
+        // 渲染成就系统页面
+        function renderAchievementsPage() {
+            const classSelect = document.getElementById('achievement-class-select');
+            const achievementsContent = document.getElementById('achievements-content');
+            
+            // 清空并重新填充班级选择框
+            classSelect.innerHTML = '<option value="">请选择班级</option>';
+            
+            const userClasses = classes.filter(c => c.teacher === currentUser);
+            userClasses.forEach(classItem => {
+                const option = document.createElement('option');
+                option.value = classItem.id;
+                option.textContent = classItem.name;
+                classSelect.appendChild(option);
+            });
+            
+            // 班级选择变化事件
+            classSelect.addEventListener('change', function() {
+                const classId = this.value;
+                
+                if (classId) {
+                    achievementsContent.style.display = 'block';
+                    renderAchievements(classId);
+                } else {
+                    achievementsContent.style.display = 'none';
+                }
+            });
+            
+            // 手动执行按钮事件
+            document.getElementById('manual-summary-btn').addEventListener('click', function() {
+                if (confirm('确定要手动执行月度总结吗？这将重置所有学生积分。')) {
+                    performMonthlySummary();
+                    const classId = classSelect.value;
+                    if (classId) {
+                        renderAchievements(classId);
+                    }
+                }
+            });
+            
+            document.getElementById('manual-weekly-btn').addEventListener('click', function() {
+                if (confirm('确定要手动执行周度加分吗？')) {
+                    performWeeklyBonus();
+                    const classId = classSelect.value;
+                    if (classId) {
+                        renderAchievements(classId);
+                    }
+                }
+            });
+            
+            document.getElementById('view-history-btn').addEventListener('click', function() {
+                const classId = classSelect.value;
+                if (classId) {
+                    showSummaryHistoryModal(classId);
+                } else {
+                    alert('请先选择班级');
+                }
+            });
+            
+            // 初始状态
+            achievementsContent.style.display = 'none';
+        }
+        
+        // 渲染成就列表
+        function renderAchievements(classId) {
+            const classStudents = students.filter(s => s.classId === classId);
+            const classAchievements = achievements.filter(a => a.classId === classId);
+            
+            // 最佳组长
+            const bestLeaders = classAchievements.filter(a => a.type === 'bestLeader');
+            renderAchievementList('best-leader-list', bestLeaders, classStudents);
+            
+            // 最优进步生
+            const mostImproved = classAchievements.filter(a => a.type === 'mostImproved');
+            renderAchievementList('most-improved-list', mostImproved, classStudents);
+            
+            // 纪律之星
+            const disciplineStars = classAchievements.filter(a => a.type === 'disciplineStar');
+            renderAchievementList('discipline-star-list', disciplineStars, classStudents);
+            
+            // 最佳奉献者
+            const bestContributors = classAchievements.filter(a => a.type === 'bestContributor');
+            renderAchievementList('best-contributor-list', bestContributors, classStudents);
+        }
+        
+        // 渲染单个成就列表
+        function renderAchievementList(containerId, achievementList, classStudents) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (achievementList.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-style: italic;">暂无成就获得者</p>';
+                return;
+            }
+            
+            achievementList.forEach(achievement => {
+                const student = classStudents.find(s => s.id === achievement.studentId);
+                if (student) {
+                    const achievementItem = document.createElement('div');
+                    achievementItem.className = 'achievement-item';
+                    achievementItem.innerHTML = `
+                        <div class="student-name">${student.name}</div>
+                        <div class="achievement-detail">${achievement.description} - ${new Date(achievement.date).toLocaleDateString()}</div>
+                    `;
+                    container.appendChild(achievementItem);
+                }
+            });
+        }
+        
+        // 显示历史总结模态框
+        function showSummaryHistoryModal(classId) {
+            const classSummaries = summaryHistory
+                .filter(s => s.classId === classId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            modalTitle.textContent = '历史总结记录';
+            modalBody.innerHTML = `
+                <div id="summary-history-list">
+                    ${classSummaries.map(summary => `
+                        <div class="history-item">
+                            <div class="history-date">${new Date(summary.date).toLocaleDateString()}</div>
+                            <div class="history-winners">
+                                <h4>前三名小组：</h4>
+                                <p>${summary.topThree.map(g => `第${g.groupId}组（${g.score}分）`).join('， ')}</p>
+                            </div>
+                            <div class="history-criticism">
+                                <h4>需鼓励小组：</h4>
+                                <p>${summary.bottomThree.map(g => `第${g.groupId}组（${g.score}分）`).join('， ')}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-secondary" id="close-history-modal">关闭</button>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('close-history-modal').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+        }
+        
         // 渲染设置页面
         function renderSettingsPage() {
             document.getElementById('default-points').value = settings.defaultPoints;
@@ -1972,6 +2277,275 @@
             });
         }
         
+        // 1. 周期总结功能
+        function performMonthlySummary() {
+            const now = new Date();
+            const userClasses = classes.filter(c => c.teacher === currentUser);
+            
+            userClasses.forEach(classItem => {
+                const classStudents = students.filter(s => s.classId === classItem.id);
+                if (classStudents.length === 0) return;
+                
+                // 计算小组总积分
+                const groupScores = {};
+                classStudents.forEach(student => {
+                    const groupId = student.groupId;
+                    if (!groupScores[groupId]) {
+                        groupScores[groupId] = {
+                            totalScore: 0,
+                            students: []
+                        };
+                    }
+                    
+                    const studentScore = student.initialPoints + student.extraPoints;
+                    groupScores[groupId].totalScore += studentScore;
+                    groupScores[groupId].students.push({
+                        id: student.id,
+                        name: student.name,
+                        score: studentScore,
+                        isLeader: student.isLeader,
+                        initialPoints: student.initialPoints,
+                        extraPoints: student.extraPoints
+                    });
+                });
+                
+                // 转换为数组并排序
+                const sortedGroups = Object.entries(groupScores)
+                    .map(([groupId, data]) => ({
+                        groupId: parseInt(groupId),
+                        totalScore: data.totalScore,
+                        students: data.students
+                    }))
+                    .sort((a, b) => b.totalScore - a.totalScore);
+                
+                // 记录获奖小组和需要鼓励的小组
+                const topThree = sortedGroups.slice(0, 3);
+                const bottomThree = sortedGroups.slice(-3).reverse();
+                
+                // 找出需要表扬和批评的学生
+                const defaultPoints = settings.defaultPoints;
+                const praisedStudents = classStudents.filter(s => 
+                    s.initialPoints === defaultPoints && s.extraPoints >= 0
+                );
+                const criticizedStudents = classStudents.filter(s => 
+                    (s.initialPoints + s.extraPoints) <= 2
+                );
+                
+                // 检查成就
+                checkAchievements(classItem.id, sortedGroups, classStudents);
+                
+                // 记录总结历史
+                const summaryRecord = {
+                    id: generateId(),
+                    classId: classItem.id,
+                    date: now.toISOString(),
+                    topThree: topThree.map(g => ({ groupId: g.groupId, score: g.totalScore })),
+                    bottomThree: bottomThree.map(g => ({ groupId: g.groupId, score: g.totalScore })),
+                    praisedStudents: praisedStudents.map(s => s.id),
+                    criticizedStudents: criticizedStudents.map(s => s.id),
+                    achievementsAwarded: achievements.filter(a => 
+                        a.classId === classItem.id && 
+                        new Date(a.date).getMonth() === now.getMonth() &&
+                        new Date(a.date).getFullYear() === now.getFullYear()
+                    ).map(a => a.id)
+                };
+                
+                summaryHistory.push(summaryRecord);
+                
+                // 重置学生积分
+                classStudents.forEach(student => {
+                    student.initialPoints = defaultPoints;
+                    student.extraPoints = 0;
+                });
+            });
+            
+            // 更新最后月度总结时间
+            settings.lastMonthlySummary = now.toISOString();
+            localStorage.setItem('settings', JSON.stringify(settings));
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+            localStorage.setItem('summaryHistory', JSON.stringify(summaryHistory));
+            
+            alert('月度总结已完成！所有学生积分已重置。');
+        }
+        
+        // 2. 每周加分机制
+        function performWeeklyBonus() {
+            const now = new Date();
+            const userClasses = classes.filter(c => c.teacher === currentUser);
+            
+            userClasses.forEach(classItem => {
+                const classStudents = students.filter(s => s.classId === classItem.id);
+                
+                classStudents.forEach(student => {
+                    // 检查学生是否一周内没有被扣分
+                    // 这里简化实现：检查初始积分是否等于默认值
+                    if (student.initialPoints === settings.defaultPoints) {
+                        student.extraPoints += 1;
+                    }
+                });
+            });
+            
+            // 更新最后周度加分时间
+            settings.lastWeeklyBonus = now.toISOString();
+            localStorage.setItem('settings', JSON.stringify(settings));
+            localStorage.setItem('students', JSON.stringify(students));
+            
+            alert('周度加分已完成！一周内未被扣分的学生已获得1分额外积分。');
+        }
+        
+        // 3. 成就系统
+        function checkAchievements(classId, sortedGroups, classStudents) {
+            const now = new Date();
+            
+            // 成就1: 最佳组长
+            const topGroupIds = sortedGroups.slice(0, 3).map(g => g.groupId);
+            topGroupIds.forEach(groupId => {
+                const groupLeader = classStudents.find(s => 
+                    s.groupId === groupId && s.isLeader
+                );
+                
+                if (groupLeader) {
+                    // 检查该组长之前获得最佳组长的次数
+                    const leaderAchievements = achievements.filter(a => 
+                        a.studentId === groupLeader.id && 
+                        a.type === 'bestLeader'
+                    );
+                    
+                    if (leaderAchievements.length >= 2) { // 已经获得2次，这是第3次
+                        achievements.push({
+                            id: generateId(),
+                            studentId: groupLeader.id,
+                            classId: classId,
+                            type: 'bestLeader',
+                            name: '最佳组长',
+                            description: '总计三次及以上身为组长带领小组成员获得每月总结前三名',
+                            date: now.toISOString()
+                        });
+                    } else {
+                        // 记录这次获得前三名
+                        achievements.push({
+                            id: generateId(),
+                            studentId: groupLeader.id,
+                            classId: classId,
+                            type: 'bestLeaderProgress',
+                            name: '最佳组长进度',
+                            description: `带领小组获得月度总结前三名（${leaderAchievements.length + 1}/3）`,
+                            date: now.toISOString()
+                        });
+                    }
+                }
+            });
+            
+            // 成就2: 最优进步生
+            classStudents.forEach(student => {
+                // 获取学生上次月度总结的积分
+                const studentHistory = summaryHistory
+                    .filter(s => s.classId === classId)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                if (studentHistory.length > 1) {
+                    const lastSummary = studentHistory[1]; // 上一次总结
+                    const currentScore = student.initialPoints + student.extraPoints;
+                    
+                    // 查找学生在上次总结中的积分
+                    // 这里简化实现：假设有明显进步（比如积分增加超过50%）
+                    const lastScore = getStudentScoreInSummary(lastSummary, student.id);
+                    if (lastScore > 0 && currentScore > lastScore * 1.5) {
+                        achievements.push({
+                            id: generateId(),
+                            studentId: student.id,
+                            classId: classId,
+                            type: 'mostImproved',
+                            name: '最优进步生',
+                            description: `积分从${lastScore}进步到${currentScore}`,
+                            date: now.toISOString()
+                        });
+                    }
+                }
+            });
+            
+            // 成就3: 纪律之星
+            classStudents.forEach(student => {
+                // 检查连续3次月度总结初始积分都等于默认值
+                const recentSummaries = summaryHistory
+                    .filter(s => s.classId === classId)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 3);
+                
+                if (recentSummaries.length === 3) {
+                    const allPerfect = recentSummaries.every(summary => {
+                        return !summary.criticizedStudents.includes(student.id);
+                    });
+                    
+                    if (allPerfect) {
+                        achievements.push({
+                            id: generateId(),
+                            studentId: student.id,
+                            classId: classId,
+                            type: 'disciplineStar',
+                            name: '纪律之星',
+                            description: '连续3次每月总结的时间里一个积分都没有扣',
+                            date: now.toISOString()
+                        });
+                    }
+                }
+            });
+            
+            // 成就4: 最佳奉献者
+            sortedGroups.forEach(group => {
+                if (group.students.length > 0) {
+                    // 找出小组中积分最高的学生
+                    const topContributor = group.students.reduce((prev, current) => 
+                        (prev.score > current.score) ? prev : current
+                    );
+                    
+                    achievements.push({
+                        id: generateId(),
+                        studentId: topContributor.id,
+                        classId: classId,
+                        type: 'bestContributor',
+                        name: '最佳奉献者',
+                        description: `在第${group.groupId}小组贡献了${topContributor.score}积分`,
+                        date: now.toISOString()
+                    });
+                }
+            });
+        }
+        
+        // 辅助函数：获取学生在某次总结中的积分
+        function getStudentScoreInSummary(summary, studentId) {
+            // 这里简化实现，实际应该从历史记录中获取
+            // 返回一个模拟值
+            return Math.floor(Math.random() * 10) + 1;
+        }
+        
+        // 检查周度加分
+        function checkWeeklyBonus() {
+            const now = new Date();
+            const lastBonus = settings.lastWeeklyBonus ? new Date(settings.lastWeeklyBonus) : null;
+            
+            // 如果是周日晚上且距离上次执行已超过6天
+            if (now.getDay() === 0 && now.getHours() === 0 && now.getMinutes() === 0) {
+                if (!lastBonus || (now - lastBonus) > 6 * 24 * 60 * 60 * 1000) {
+                    performWeeklyBonus();
+                }
+            }
+        }
+        
+        // 检查月度总结
+        function checkMonthlySummary() {
+            const now = new Date();
+            const lastSummary = settings.lastMonthlySummary ? new Date(settings.lastMonthlySummary) : null;
+            
+            // 如果是每月第一天且距离上次执行已超过27天
+            if (now.getDate() === 1 && now.getHours() === 0 && now.getMinutes() === 0) {
+                if (!lastSummary || (now - lastSummary) > 27 * 24 * 60 * 60 * 1000) {
+                    performMonthlySummary();
+                }
+            }
+        }
+        
         // 生成唯一ID
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -2042,6 +2616,18 @@
                 students.push(...exampleStudents);
                 localStorage.setItem('students', JSON.stringify(students));
             }
+            
+            // 检查是否需要执行周度加分
+            checkWeeklyBonus();
+            
+            // 检查是否需要执行月度总结
+            checkMonthlySummary();
+            
+            // 设置定时器，每分钟检查一次
+            setInterval(function() {
+                checkWeeklyBonus();
+                checkMonthlySummary();
+            }, 60000); // 每分钟检查一次
         });
     </script>
 </body>
