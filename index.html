@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>班级小组竞赛系统</title>
     <style>
+        /* 样式保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -2088,24 +2089,22 @@
                 }
             });
             
-            // 手动执行按钮事件
+            // 手动执行按钮事件 - 已移除确认弹窗
             document.getElementById('manual-summary-btn').addEventListener('click', function() {
-                if (confirm('确定要手动执行月度总结吗？这将重置所有学生积分。')) {
-                    performMonthlySummary();
-                    const classId = classSelect.value;
-                    if (classId) {
-                        renderAchievements(classId);
-                    }
+                // 直接执行月度总结，不显示确认弹窗
+                performMonthlySummary();
+                const classId = classSelect.value;
+                if (classId) {
+                    renderAchievements(classId);
                 }
             });
             
             document.getElementById('manual-weekly-btn').addEventListener('click', function() {
-                if (confirm('确定要手动执行周度加分吗？')) {
-                    performWeeklyBonus();
-                    const classId = classSelect.value;
-                    if (classId) {
-                        renderAchievements(classId);
-                    }
+                // 直接执行周度加分，不显示确认弹窗
+                performWeeklyBonus();
+                const classId = classSelect.value;
+                if (classId) {
+                    renderAchievements(classId);
                 }
             });
             
