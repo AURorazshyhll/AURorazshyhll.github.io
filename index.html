@@ -912,7 +912,11 @@
         let settings = JSON.parse(localStorage.getItem('settings')) || { 
             defaultPoints: 5,
             lastWeeklyBonus: null,
-            lastMonthlySummary: null
+            lastMonthlySummary: null,
+            pendingWeeklyBonus: false,
+            pendingMonthlySummary: false,
+            nextWeeklyBonus: null,
+            nextMonthlySummary: null
         };
         let achievements = JSON.parse(localStorage.getItem('achievements')) || [];
         let summaryHistory = JSON.parse(localStorage.getItem('summaryHistory')) || [];
@@ -963,9 +967,31 @@
             const user = users.find(u => u.username === username && u.password === password);
             
             if (user) {
-                showMessage('登录成功！正在跳转...', 'success');
                 currentUser = username;
                 currentUserSpan.textContent = `欢迎，${username}老师`;
+                
+                // 检查是否有待执行的总结
+                const hasPendingWeekly = settings.pendingWeeklyBonus;
+                const hasPendingMonthly = settings.pendingMonthlySummary;
+                
+                if (hasPendingWeekly || hasPendingMonthly) {
+                    let message = '登录成功！系统检测到有待执行的';
+                    if (hasPendingWeekly && hasPendingMonthly) {
+                        message += '周度加分和月度总结';
+                    } else if (hasPendingWeekly) {
+                        message += '周度加分';
+                    } else {
+                        message += '月度总结';
+                    }
+                    message += '，正在自动执行...';
+                    
+                    showMessage(message, 'success');
+                    
+                    // 执行待处理的总结
+                    checkAndExecutePendingSummaries();
+                } else {
+                    showMessage('登录成功！正在跳转...', 'success');
+                }
                 
                 setTimeout(() => {
                     authContainer.style.display = 'none';
@@ -2101,44 +2127,67 @@
             const classStudents = students.filter(s => s.classId === classId);
             const classAchievements = achievements.filter(a => a.classId === classId);
             
-            // 最佳组长
-            const bestLeaders = classAchievements.filter(a => a.type === 'bestLeader');
-            renderAchievementList('best-leader-list', bestLeaders, classStudents);
+            // 最佳组长 - 只显示每个学生一次
+            const bestLeaders = getUniqueStudentsByAchievement(classAchievements, 'bestLeader', classStudents);
+            renderUniqueAchievementList('best-leader-list', bestLeaders, '最佳组长');
             
-            // 最优进步生
-            const mostImproved = classAchievements.filter(a => a.type === 'mostImproved');
-            renderAchievementList('most-improved-list', mostImproved, classStudents);
+            // 最优进步生 - 只显示每个学生一次
+            const mostImproved = getUniqueStudentsByAchievement(classAchievements, 'mostImproved', classStudents);
+            renderUniqueAchievementList('most-improved-list', mostImproved, '最优进步生');
             
-            // 纪律之星
-            const disciplineStars = classAchievements.filter(a => a.type === 'disciplineStar');
-            renderAchievementList('discipline-star-list', disciplineStars, classStudents);
+            // 纪律之星 - 只显示每个学生一次
+            const disciplineStars = getUniqueStudentsByAchievement(classAchievements, 'disciplineStar', classStudents);
+            renderUniqueAchievementList('discipline-star-list', disciplineStars, '纪律之星');
             
-            // 最佳奉献者
-            const bestContributors = classAchievements.filter(a => a.type === 'bestContributor');
-            renderAchievementList('best-contributor-list', bestContributors, classStudents);
+            // 最佳奉献者 - 只显示每个学生一次
+            const bestContributors = getUniqueStudentsByAchievement(classAchievements, 'bestContributor', classStudents);
+            renderUniqueAchievementList('best-contributor-list', bestContributors, '最佳奉献者');
         }
         
-        // 渲染单个成就列表
-        function renderAchievementList(containerId, achievementList, classStudents) {
+        // 获取每个成就类型下的唯一学生列表
+        function getUniqueStudentsByAchievement(achievements, type, classStudents) {
+            const uniqueStudentIds = new Set();
+            const uniqueStudents = [];
+            
+            // 按日期排序，确保我们获取最新的成就记录
+            const sortedAchievements = achievements
+                .filter(a => a.type === type)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // 遍历成就记录，只添加每个学生的第一次出现
+            sortedAchievements.forEach(achievement => {
+                if (!uniqueStudentIds.has(achievement.studentId)) {
+                    uniqueStudentIds.add(achievement.studentId);
+                    const student = classStudents.find(s => s.id === achievement.studentId);
+                    if (student) {
+                        uniqueStudents.push({
+                            student: student,
+                            achievement: achievement
+                        });
+                    }
+                }
+            });
+            
+            return uniqueStudents;
+        }
+        
+        // 渲染唯一的成就列表（只显示学生名字）
+        function renderUniqueAchievementList(containerId, studentAchievements, achievementName) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             
-            if (achievementList.length === 0) {
-                container.innerHTML = '<p style="color: #999; font-style: italic;">暂无成就获得者</p>';
+            if (studentAchievements.length === 0) {
+                container.innerHTML = `<p style="color: #999; font-style: italic;">暂无${achievementName}获得者</p>`;
                 return;
             }
             
-            achievementList.forEach(achievement => {
-                const student = classStudents.find(s => s.id === achievement.studentId);
-                if (student) {
-                    const achievementItem = document.createElement('div');
-                    achievementItem.className = 'achievement-item';
-                    achievementItem.innerHTML = `
-                        <div class="student-name">${student.name}</div>
-                        <div class="achievement-detail">${achievement.description} - ${new Date(achievement.date).toLocaleDateString()}</div>
-                    `;
-                    container.appendChild(achievementItem);
-                }
+            studentAchievements.forEach(item => {
+                const achievementItem = document.createElement('div');
+                achievementItem.className = 'achievement-item';
+                achievementItem.innerHTML = `
+                    <div class="student-name">${item.student.name}</div>
+                `;
+                container.appendChild(achievementItem);
             });
         }
         
@@ -2361,6 +2410,8 @@
             
             // 更新最后月度总结时间
             settings.lastMonthlySummary = now.toISOString();
+            settings.pendingMonthlySummary = false;
+            settings.nextMonthlySummary = getNextMonthlySummaryDate(now);
             localStorage.setItem('settings', JSON.stringify(settings));
             localStorage.setItem('students', JSON.stringify(students));
             localStorage.setItem('achievements', JSON.stringify(achievements));
@@ -2388,6 +2439,8 @@
             
             // 更新最后周度加分时间
             settings.lastWeeklyBonus = now.toISOString();
+            settings.pendingWeeklyBonus = false;
+            settings.nextWeeklyBonus = getNextWeeklyBonusDate(now);
             localStorage.setItem('settings', JSON.stringify(settings));
             localStorage.setItem('students', JSON.stringify(students));
             
@@ -2406,88 +2459,117 @@
                 );
                 
                 if (groupLeader) {
-                    // 检查该组长之前获得最佳组长的次数
-                    const leaderAchievements = achievements.filter(a => 
+                    // 检查该组长之前是否已经获得最佳组长成就
+                    const hasBestLeaderAchievement = achievements.some(a => 
                         a.studentId === groupLeader.id && 
                         a.type === 'bestLeader'
                     );
                     
-                    if (leaderAchievements.length >= 2) { // 已经获得2次，这是第3次
-                        achievements.push({
-                            id: generateId(),
-                            studentId: groupLeader.id,
-                            classId: classId,
-                            type: 'bestLeader',
-                            name: '最佳组长',
-                            description: '总计三次及以上身为组长带领小组成员获得每月总结前三名',
-                            date: now.toISOString()
-                        });
-                    } else {
-                        // 记录这次获得前三名
-                        achievements.push({
-                            id: generateId(),
-                            studentId: groupLeader.id,
-                            classId: classId,
-                            type: 'bestLeaderProgress',
-                            name: '最佳组长进度',
-                            description: `带领小组获得月度总结前三名（${leaderAchievements.length + 1}/3）`,
-                            date: now.toISOString()
-                        });
+                    if (!hasBestLeaderAchievement) {
+                        // 检查该组长之前获得最佳组长进度的次数
+                        const leaderProgressAchievements = achievements.filter(a => 
+                            a.studentId === groupLeader.id && 
+                            a.type === 'bestLeaderProgress'
+                        );
+                        
+                        if (leaderProgressAchievements.length >= 2) { // 已经获得2次进度，这是第3次
+                            achievements.push({
+                                id: generateId(),
+                                studentId: groupLeader.id,
+                                classId: classId,
+                                type: 'bestLeader',
+                                name: '最佳组长',
+                                description: '总计三次及以上身为组长带领小组成员获得每月总结前三名',
+                                date: now.toISOString()
+                            });
+                            
+                            // 删除进度记录
+                            achievements = achievements.filter(a => 
+                                !(a.studentId === groupLeader.id && a.type === 'bestLeaderProgress')
+                            );
+                        } else {
+                            // 记录这次获得前三名
+                            achievements.push({
+                                id: generateId(),
+                                studentId: groupLeader.id,
+                                classId: classId,
+                                type: 'bestLeaderProgress',
+                                name: '最佳组长进度',
+                                description: `带领小组获得月度总结前三名（${leaderProgressAchievements.length + 1}/3）`,
+                                date: now.toISOString()
+                            });
+                        }
                     }
                 }
             });
             
             // 成就2: 最优进步生
             classStudents.forEach(student => {
-                // 获取学生上次月度总结的积分
-                const studentHistory = summaryHistory
-                    .filter(s => s.classId === classId)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                // 检查该学生是否已经获得最优进步生成就
+                const hasMostImprovedAchievement = achievements.some(a => 
+                    a.studentId === student.id && 
+                    a.type === 'mostImproved'
+                );
                 
-                if (studentHistory.length > 1) {
-                    const lastSummary = studentHistory[1]; // 上一次总结
-                    const currentScore = student.initialPoints + student.extraPoints;
+                if (!hasMostImprovedAchievement) {
+                    // 获取学生上次月度总结的积分
+                    const studentHistory = summaryHistory
+                        .filter(s => s.classId === classId)
+                        .sort((a, b) => new Date(b.date) - new Date(a.date));
                     
-                    // 查找学生在上次总结中的积分
-                    // 这里简化实现：假设有明显进步（比如积分增加超过50%）
-                    const lastScore = getStudentScoreInSummary(lastSummary, student.id);
-                    if (lastScore > 0 && currentScore > lastScore * 1.5) {
-                        achievements.push({
-                            id: generateId(),
-                            studentId: student.id,
-                            classId: classId,
-                            type: 'mostImproved',
-                            name: '最优进步生',
-                            description: `积分从${lastScore}进步到${currentScore}`,
-                            date: now.toISOString()
-                        });
+                    if (studentHistory.length > 1) {
+                        const lastSummary = studentHistory[1]; // 上一次总结
+                        const currentScore = student.initialPoints + student.extraPoints;
+                        
+                        // 查找学生在上次总结中的积分
+                        // 这里简化实现：假设有明显进步（比如积分增加超过50%）
+                        const lastScore = getStudentScoreInSummary(lastSummary, student.id);
+                        if (lastScore > 0 && currentScore > lastScore * 1.5) {
+                            achievements.push({
+                                id: generateId(),
+                                studentId: student.id,
+                                classId: classId,
+                                type: 'mostImproved',
+                                name: '最优进步生',
+                                description: `积分从${lastScore}进步到${currentScore}`,
+                                date: now.toISOString()
+                            });
+                        }
                     }
                 }
             });
             
             // 成就3: 纪律之星
             classStudents.forEach(student => {
-                // 检查连续3次月度总结初始积分都等于默认值
-                const recentSummaries = summaryHistory
-                    .filter(s => s.classId === classId)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .slice(0, 3);
+                // 检查该学生是否已经获得纪律之星成就
+                const hasDisciplineStarAchievement = achievements.some(a => 
+                    a.studentId === student.id && 
+                    a.type === 'disciplineStar'
+                );
                 
-                if (recentSummaries.length === 3) {
-                    const allPerfect = recentSummaries.every(summary => {
-                        return !summary.criticizedStudents.includes(student.id);
-                    });
+                if (!hasDisciplineStarAchievement) {
+                    // 检查连续3次月度总结初始积分都等于默认值
+                    const recentSummaries = summaryHistory
+                        .filter(s => s.classId === classId)
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .slice(0, 3);
                     
-                    if (allPerfect) {
-                        achievements.push({
-                            id: generateId(),
-                            studentId: student.id,
-                            classId: classId,
-                            type: 'disciplineStar',
-                            name: '纪律之星',
-                            description: '连续3次每月总结的时间里一个积分都没有扣',
-                            date: now.toISOString()
+                    if (recentSummaries.length === 3) {
+                        const allPerfect = recentSummaries.every(summary => {
+                            return !summary.criticizedStudents.includes(student.id);
                         });
+                        
+                        if (allPerfect) {
+                            achievements.push({
+                                id: generateId(),
+                                studentId: student.id,
+                                classId: classId,
+                                type: 'disciplineStar',
+                                name: '纪律之星',
+                                description: '连续3次每月总结的时间里一个积分都没有扣',
+                                date: now.toISOString()
+                            });
+                        }
                     }
                 }
             });
@@ -2500,15 +2582,23 @@
                         (prev.score > current.score) ? prev : current
                     );
                     
-                    achievements.push({
-                        id: generateId(),
-                        studentId: topContributor.id,
-                        classId: classId,
-                        type: 'bestContributor',
-                        name: '最佳奉献者',
-                        description: `在第${group.groupId}小组贡献了${topContributor.score}积分`,
-                        date: now.toISOString()
-                    });
+                    // 检查该学生是否已经获得最佳奉献者成就
+                    const hasBestContributorAchievement = achievements.some(a => 
+                        a.studentId === topContributor.id && 
+                        a.type === 'bestContributor'
+                    );
+                    
+                    if (!hasBestContributorAchievement) {
+                        achievements.push({
+                            id: generateId(),
+                            studentId: topContributor.id,
+                            classId: classId,
+                            type: 'bestContributor',
+                            name: '最佳奉献者',
+                            description: `在第${group.groupId}小组贡献了${topContributor.score}积分`,
+                            date: now.toISOString()
+                        });
+                    }
                 }
             });
         }
@@ -2523,12 +2613,17 @@
         // 检查周度加分
         function checkWeeklyBonus() {
             const now = new Date();
-            const lastBonus = settings.lastWeeklyBonus ? new Date(settings.lastWeeklyBonus) : null;
             
-            // 如果是周日晚上且距离上次执行已超过6天
+            // 如果是周日晚上00:00:00，设置待执行标志
             if (now.getDay() === 0 && now.getHours() === 0 && now.getMinutes() === 0) {
+                const lastBonus = settings.lastWeeklyBonus ? new Date(settings.lastWeeklyBonus) : null;
+                
+                // 确保至少间隔6天
                 if (!lastBonus || (now - lastBonus) > 6 * 24 * 60 * 60 * 1000) {
-                    performWeeklyBonus();
+                    settings.pendingWeeklyBonus = true;
+                    settings.nextWeeklyBonus = getNextWeeklyBonusDate(now);
+                    localStorage.setItem('settings', JSON.stringify(settings));
+                    console.log('已计划周度加分，等待教师登录后执行');
                 }
             }
         }
@@ -2536,14 +2631,56 @@
         // 检查月度总结
         function checkMonthlySummary() {
             const now = new Date();
-            const lastSummary = settings.lastMonthlySummary ? new Date(settings.lastMonthlySummary) : null;
             
-            // 如果是每月第一天且距离上次执行已超过27天
+            // 如果是每月第一天00:00:00，设置待执行标志
             if (now.getDate() === 1 && now.getHours() === 0 && now.getMinutes() === 0) {
+                const lastSummary = settings.lastMonthlySummary ? new Date(settings.lastMonthlySummary) : null;
+                
+                // 确保至少间隔27天
                 if (!lastSummary || (now - lastSummary) > 27 * 24 * 60 * 60 * 1000) {
-                    performMonthlySummary();
+                    settings.pendingMonthlySummary = true;
+                    settings.nextMonthlySummary = getNextMonthlySummaryDate(now);
+                    localStorage.setItem('settings', JSON.stringify(settings));
+                    console.log('已计划月度总结，等待教师登录后执行');
                 }
             }
+        }
+        
+        // 检查并执行待处理的总结
+        function checkAndExecutePendingSummaries() {
+            let executedSummary = false;
+            
+            // 检查并执行周度加分
+            if (settings.pendingWeeklyBonus) {
+                performWeeklyBonus();
+                executedSummary = true;
+                console.log('已执行待处理的周度加分');
+            }
+            
+            // 检查并执行月度总结
+            if (settings.pendingMonthlySummary) {
+                performMonthlySummary();
+                executedSummary = true;
+                console.log('已执行待处理的月度总结');
+            }
+            
+            return executedSummary;
+        }
+        
+        // 计算下次周度加分时间（下周日）
+        function getNextWeeklyBonusDate(currentDate) {
+            const nextSunday = new Date(currentDate);
+            nextSunday.setDate(currentDate.getDate() + (7 - currentDate.getDay()));
+            nextSunday.setHours(0, 0, 0, 0);
+            return nextSunday.toISOString();
+        }
+        
+        // 计算下次月度总结时间（下个月第一天）
+        function getNextMonthlySummaryDate(currentDate) {
+            const nextMonth = new Date(currentDate);
+            nextMonth.setMonth(currentDate.getMonth() + 1, 1);
+            nextMonth.setHours(0, 0, 0, 0);
+            return nextMonth.toISOString();
         }
         
         // 生成唯一ID
@@ -2561,6 +2698,17 @@
                 ];
                 localStorage.setItem('teacherUsers', JSON.stringify(defaultUsers));
             }
+            
+            // 初始化下次总结时间（如果未设置）
+            if (!settings.nextWeeklyBonus) {
+                settings.nextWeeklyBonus = getNextWeeklyBonusDate(new Date());
+            }
+            
+            if (!settings.nextMonthlySummary) {
+                settings.nextMonthlySummary = getNextMonthlySummaryDate(new Date());
+            }
+            
+            localStorage.setItem('settings', JSON.stringify(settings));
             
             // 如果有示例数据，可以在这里添加
             if (classes.length === 0) {
