@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>班级小组竞赛系统</title>
     <style>
-        /* 样式保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -1203,7 +1202,6 @@
                 const className = document.getElementById('class-name').value.trim();
                 
                 if (!className) {
-                    alert('请输入班级名称');
                     return;
                 }
                 
@@ -1250,7 +1248,6 @@
                 const className = document.getElementById('edit-class-name').value.trim();
                 
                 if (!className) {
-                    alert('请输入班级名称');
                     return;
                 }
                 
@@ -1299,10 +1296,14 @@
             });
         }
         
-        // 渲染学生管理页面
+        // 渲染学生管理页面 - 修复问题
         function renderStudentsPage() {
             const classSelect = document.getElementById('class-select');
             const studentManagement = document.getElementById('student-management');
+            
+            // 重置班级选择和学生管理区域
+            classSelect.value = '';
+            studentManagement.style.display = 'none';
             
             // 清空并重新填充班级选择框
             classSelect.innerHTML = '<option value="">请选择班级</option>';
@@ -1331,7 +1332,6 @@
             document.getElementById('add-student-btn').addEventListener('click', function() {
                 const classId = classSelect.value;
                 if (!classId) {
-                    alert('请先选择班级');
                     return;
                 }
                 showAddStudentModal(classId);
@@ -1341,7 +1341,6 @@
             document.getElementById('bulk-import-btn').addEventListener('click', function() {
                 const classId = classSelect.value;
                 if (!classId) {
-                    alert('请先选择班级');
                     return;
                 }
                 showBulkImportModal(classId);
@@ -1453,7 +1452,6 @@
                 const isLeader = document.getElementById('student-is-leader').checked;
                 
                 if (!name) {
-                    alert('请输入学生姓名');
                     return;
                 }
                 
@@ -1466,7 +1464,6 @@
                     );
                     
                     if (existingLeader) {
-                        alert(`第${groupId}小组已经有组长：${existingLeader.name}，请先取消其组长身份`);
                         return;
                     }
                 }
@@ -1516,7 +1513,6 @@
                 const data = document.getElementById('bulk-students-data').value.trim();
                 
                 if (!data) {
-                    alert('请输入学生数据');
                     return;
                 }
                 
@@ -1588,7 +1584,6 @@
                 });
                 
                 if (errors.length > 0) {
-                    alert('导入失败，请检查以下错误：\n' + errors.join('\n'));
                     return;
                 }
                 
@@ -1598,8 +1593,6 @@
                 
                 modal.classList.remove('active');
                 renderStudentsTable(classId);
-                
-                alert(`成功导入${newStudents.length}名学生`);
             });
         }
         
@@ -1631,7 +1624,6 @@
                 const amount = parseInt(document.getElementById('add-points-amount').value);
                 
                 if (isNaN(amount) || amount <= 0) {
-                    alert('请输入有效的加分数量');
                     return;
                 }
                 
@@ -1641,8 +1633,6 @@
                 
                 modal.classList.remove('active');
                 renderStudentsTable(student.classId);
-                
-                alert(`成功为${student.name}加${amount}分`);
             });
         }
         
@@ -1705,7 +1695,6 @@
                 const amount = parseInt(document.getElementById('deduct-points-amount').value);
                 
                 if (isNaN(amount) || amount <= 0) {
-                    alert('请输入有效的扣分数量');
                     return;
                 }
                 
@@ -1740,8 +1729,6 @@
                 
                 modal.classList.remove('active');
                 renderStudentsTable(student.classId);
-                
-                alert(`成功为${student.name}扣${amount}分`);
             });
         }
         
@@ -1792,7 +1779,6 @@
                 const isLeader = document.getElementById('edit-student-is-leader').checked;
                 
                 if (!name) {
-                    alert('请输入学生姓名');
                     return;
                 }
                 
@@ -1805,7 +1791,6 @@
                     );
                     
                     if (existingLeader) {
-                        alert(`第${groupId}小组已经有组长：${existingLeader.name}，请先取消其组长身份`);
                         return;
                     }
                 }
@@ -2055,9 +2040,13 @@
                 localStorage.setItem('students', JSON.stringify(students));
                 
                 modal.classList.remove('active');
-                renderRanking(classId);
+                renderRanking(classId); // 更新排行榜
                 
-                alert(`第${groupId}小组积分已更新`);
+                // 修复：更新学生管理页面的显示
+                const studentClassSelect = document.getElementById('class-select');
+                if (studentClassSelect && studentClassSelect.value === classId) {
+                    renderStudentsTable(classId);
+                }
             });
         }
         
@@ -2089,31 +2078,48 @@
                 }
             });
             
-            // 手动执行按钮事件 - 已移除确认弹窗
-            document.getElementById('manual-summary-btn').addEventListener('click', function() {
-                // 直接执行月度总结，不显示确认弹窗
+            // 修复：手动执行按钮事件 - 使用一次性绑定
+            const manualSummaryBtn = document.getElementById('manual-summary-btn');
+            const manualWeeklyBtn = document.getElementById('manual-weekly-btn');
+            const viewHistoryBtn = document.getElementById('view-history-btn');
+            
+            // 移除之前的事件监听器（如果有）
+            manualSummaryBtn.replaceWith(manualSummaryBtn.cloneNode(true));
+            manualWeeklyBtn.replaceWith(manualWeeklyBtn.cloneNode(true));
+            viewHistoryBtn.replaceWith(viewHistoryBtn.cloneNode(true));
+            
+            // 重新获取元素引用
+            const newManualSummaryBtn = document.getElementById('manual-summary-btn');
+            const newManualWeeklyBtn = document.getElementById('manual-weekly-btn');
+            const newViewHistoryBtn = document.getElementById('view-history-btn');
+            
+            // 绑定新的事件监听器
+            newManualSummaryBtn.addEventListener('click', function() {
+                // 直接执行月度总结，不显示任何弹窗
                 performMonthlySummary();
                 const classId = classSelect.value;
                 if (classId) {
                     renderAchievements(classId);
                 }
+                // 更新其他页面的显示
+                updateAllPages();
             });
             
-            document.getElementById('manual-weekly-btn').addEventListener('click', function() {
-                // 直接执行周度加分，不显示确认弹窗
+            newManualWeeklyBtn.addEventListener('click', function() {
+                // 直接执行周度加分，不显示任何弹窗
                 performWeeklyBonus();
                 const classId = classSelect.value;
                 if (classId) {
                     renderAchievements(classId);
                 }
+                // 更新其他页面的显示
+                updateAllPages();
             });
             
-            document.getElementById('view-history-btn').addEventListener('click', function() {
+            newViewHistoryBtn.addEventListener('click', function() {
                 const classId = classSelect.value;
                 if (classId) {
                     showSummaryHistoryModal(classId);
-                } else {
-                    alert('请先选择班级');
                 }
             });
             
@@ -2235,14 +2241,11 @@
                 const defaultPoints = parseInt(document.getElementById('default-points').value);
                 
                 if (isNaN(defaultPoints) || defaultPoints < 1) {
-                    alert('请输入有效的默认初始积分');
                     return;
                 }
                 
                 settings.defaultPoints = defaultPoints;
                 localStorage.setItem('settings', JSON.stringify(settings));
-                
-                alert('设置已保存');
             });
             
             // 注销账号按钮事件
@@ -2290,7 +2293,6 @@
             
             document.getElementById('confirm-delete-account').addEventListener('click', function() {
                 if (confirmUsernameInput.value !== currentUser) {
-                    alert('用户名不匹配，请重新输入');
                     return;
                 }
                 
@@ -2320,12 +2322,10 @@
                 authContainer.style.display = 'flex';
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
-                
-                alert('账号已成功注销');
             });
         }
         
-        // 1. 周期总结功能
+        // 1. 周期总结功能 - 修复需鼓励小组逻辑
         function performMonthlySummary() {
             const now = new Date();
             const userClasses = classes.filter(c => c.teacher === currentUser);
@@ -2368,7 +2368,17 @@
                 
                 // 记录获奖小组和需要鼓励的小组
                 const topThree = sortedGroups.slice(0, 3);
-                const bottomThree = sortedGroups.slice(-3).reverse();
+                
+                // 修复：如果小组数量少于6，前三名小组不应被列为需鼓励小组
+                let bottomThree = [];
+                if (sortedGroups.length >= 6) {
+                    // 小组数量大于等于6时，取最后3名
+                    bottomThree = sortedGroups.slice(-3).reverse();
+                } else if (sortedGroups.length > 3) {
+                    // 小组数量在4-5之间时，取最后几名（排除前三名）
+                    bottomThree = sortedGroups.slice(3).reverse();
+                }
+                // 如果小组数量小于等于3，则没有需鼓励小组
                 
                 // 找出需要表扬和批评的学生
                 const defaultPoints = settings.defaultPoints;
@@ -2415,24 +2425,30 @@
             localStorage.setItem('students', JSON.stringify(students));
             localStorage.setItem('achievements', JSON.stringify(achievements));
             localStorage.setItem('summaryHistory', JSON.stringify(summaryHistory));
-            
-            
         }
         
-        // 2. 每周加分机制
+        // 2. 每周加分机制 - 修复重复加分问题
         function performWeeklyBonus() {
             const now = new Date();
             const userClasses = classes.filter(c => c.teacher === currentUser);
+            
+            // 使用一个标志来确保每个学生只被处理一次
+            const processedStudents = new Set();
             
             userClasses.forEach(classItem => {
                 const classStudents = students.filter(s => s.classId === classItem.id);
                 
                 classStudents.forEach(student => {
+                    // 确保每个学生只被处理一次
+                    if (processedStudents.has(student.id)) return;
+                    
                     // 检查学生是否一周内没有被扣分
                     // 这里简化实现：检查初始积分是否等于默认值
                     if (student.initialPoints === settings.defaultPoints) {
                         student.extraPoints += 1;
                     }
+                    
+                    processedStudents.add(student.id);
                 });
             });
             
@@ -2442,8 +2458,6 @@
             settings.nextWeeklyBonus = getNextWeeklyBonusDate(now);
             localStorage.setItem('settings', JSON.stringify(settings));
             localStorage.setItem('students', JSON.stringify(students));
-            
-           
         }
         
         // 3. 成就系统
@@ -2680,6 +2694,29 @@
             nextMonth.setMonth(currentDate.getMonth() + 1, 1);
             nextMonth.setHours(0, 0, 0, 0);
             return nextMonth.toISOString();
+        }
+        
+        // 更新所有页面的显示
+        function updateAllPages() {
+            // 获取当前选中的班级
+            const studentClassSelect = document.getElementById('class-select');
+            const rankingClassSelect = document.getElementById('ranking-class-select');
+            const achievementClassSelect = document.getElementById('achievement-class-select');
+            
+            // 更新学生管理页面
+            if (studentClassSelect.value) {
+                renderStudentsTable(studentClassSelect.value);
+            }
+            
+            // 更新排行榜页面
+            if (rankingClassSelect.value) {
+                renderRanking(rankingClassSelect.value);
+            }
+            
+            // 更新成就系统页面
+            if (achievementClassSelect.value) {
+                renderAchievements(achievementClassSelect.value);
+            }
         }
         
         // 生成唯一ID
